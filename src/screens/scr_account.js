@@ -2,14 +2,14 @@ import { View, Text, StyleSheet } from "react-native";
 
 export default function ProfileScreen() {
     return (
-        <View style = {styles.maincontent}>
+        <View style = {styles.container}>
             <Text>Acc Screen</Text>
         </View>
     )
 }
 
 const styles = StyleSheet.create({
-    maincontent: {
+    container: {
         justifyContent: 'center',
         alignItems: 'center',
         height: '100%',
