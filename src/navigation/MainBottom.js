@@ -1,14 +1,13 @@
 import { StatusBar } from 'expo-status-bar'
 import React, { Fragment } from 'react'
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
-import { NavigationContainer } from '@react-navigation/native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import HomeScreen from '../screens/scr_home'
+import HomeScreen from '../screens/scr_home/scr_home'
 import SearchScreen from '../screens/scr_search'
 import GroceriesScreen from '../screens/scr_groceries'
 import AccountScreen from '../screens/scr_account'
-
+import DishDetail from '../screens/scr_dishDetails/scr_dishDetails'
 const Tab = createBottomTabNavigator()
 
 export default function MainBottom() {
@@ -60,6 +59,7 @@ export default function MainBottom() {
             tabBarItemStyle: { marginRight: 5 },
           }}
         />
+        {/* tạm thời để dishDeatail chỗ này cho dễ code */}
         <Tab.Screen
           name='Search'
           component={SearchScreen}
