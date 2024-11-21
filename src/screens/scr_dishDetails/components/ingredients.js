@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     gap: 10,
     marginBottom: 6,
     marginTop: 6,
-    alignItems: 'center'
+    alignItems: 'center',
   },
   ingredient_name_box: {
     width: 200,
@@ -63,6 +63,5 @@ const styles = StyleSheet.create({
     borderRadius: 1000,
     justifyContent: 'center',
     alignItems: 'center',
-    
   },
 })

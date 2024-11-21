@@ -125,11 +125,12 @@ export default function DishDetail() {
   return (
     <View style={styles.container}>
       <ScrollView>
-          <ImageBackground source={dishDetail.dish_img} style={styles.dish_img}>
-            <TouchableOpacity style={styles.btn_back} onPress={() => alert('quay lại trang trước')}>
-              <Icon name='angle-left' size={30} color={'#000'} />
-            </TouchableOpacity>
-          </ImageBackground>
+        <ImageBackground source={dishDetail.dish_img} style={styles.dish_img}>
+          <TouchableOpacity style={styles.btn_back} onPress={() => alert('quay lại trang trước')}>
+            <Icon name='angle-left' size={30} color={'#000'} />
+          </TouchableOpacity>
+        </ImageBackground>
+        <View style ={styles.mainContent}>
           <View style={styles.head}>
             <Text style={styles.dish_name}>{dishDetail.dish_name}</Text>
             {/* Các nút react */}
@@ -156,7 +157,7 @@ export default function DishDetail() {
               </View>
             </View>
           </View>
-
+  
           {/* Phần tên acc với desc */}
           <View style={styles.info}>
             <View style={styles.info_acc}>
@@ -174,7 +175,7 @@ export default function DishDetail() {
               <Text style={styles.seeMoreText}>{isExpanded ? 'Thu gọn' : 'Xem thêm'}</Text>
             </TouchableOpacity>
           </View>
-
+  
           {/* Phần nguyên liệu */}
           <View style={styles.ingredient_box}>
             <Text style={styles.title}>Nguyên Liệu</Text>
@@ -188,7 +189,7 @@ export default function DishDetail() {
               </TouchableOpacity>
             </View>
           </View>
-
+  
           {/* Các bước nấu ăn */}
           <View style={styles.cookingSteps_box}>
             <Text style={styles.title_Steps}>Các bước nấu ăn</Text>
@@ -200,7 +201,7 @@ export default function DishDetail() {
               <Text style={styles.btnText}>Bắt đầu nấu ăn</Text>
             </TouchableOpacity>
           </View>
-
+  
           {/* Bình luận */}
           <View style={styles.cmt_box}>
             <Text style={styles.title}>Bình luận</Text>
@@ -218,6 +219,7 @@ export default function DishDetail() {
             </View>
             <CommentList data={commentList} />
           </View>
+        </View>
       </ScrollView>
     </View>
   )
@@ -227,6 +229,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  mainContent: {
+    flexDirection: 'absolute'
+  },
   head: {
     justifyContent: 'center',
     paddingBottom: 30,
@@ -234,7 +239,7 @@ const styles = StyleSheet.create({
     borderColor: '#D9D9D9',
   },
   dish_img: {
-    width: 412,
+    width: "100%",
     height: 418,
   },
   btn_back: {

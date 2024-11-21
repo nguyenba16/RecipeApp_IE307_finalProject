@@ -62,15 +62,12 @@ export default function MainBottom() {
         {/* tạm thời để dishDeatail chỗ này cho dễ code */}
         <Tab.Screen
           name='Search'
-          component={SearchScreen}
+          component={DishDetail}
           options={{
-            tabBarItemStyle: {marginRight: 60},
+            tabBarItemStyle: { marginRight: 60 },
           }}
         />
-        <Tab.Screen
-          name='Groceries'
-          component={GroceriesScreen}
-        />
+        <Tab.Screen name='Groceries' component={GroceriesScreen} />
         <Tab.Screen
           name='Profile'
           component={AccountScreen}

@@ -10,7 +10,7 @@ export default function Steps({ cookingSteps }) {
             <View style={styles.head}>
               <Text style={styles.count_step}>Bước {step.id} </Text>
             </View>
-            <Image source={step.img_step} style = {styles.img_step} ></Image>
+            <Image source={step.img_step} style={styles.img_step}></Image>
             <Text style={styles.desc_box}>
               <Text style={styles.title}>Mô tả:</Text> {step.desc_step}
             </Text>
@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
   img_step: {
     width: 412,
     height: 236,
-    resizeMode: 'cover'
+    resizeMode: 'cover',
   },
   title: {
     fontSize: 15,

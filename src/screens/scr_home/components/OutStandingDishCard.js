@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
 import { useState } from 'react'
 import Icon from 'react-native-vector-icons/FontAwesome'
 
-const OutStandingDishCard = ({ dish}) => {
+const OutStandingDishCard = ({ dish }) => {
   const [liked, setLiked] = useState(false)
   const handleLike = () => {
     setLiked(!liked)
@@ -18,8 +18,8 @@ const OutStandingDishCard = ({ dish}) => {
       <Text style={styles.dish_name} numberOfLines={2}>
         {dish.dishName}
       </Text>
-      <View style = {styles.time_box}>
-        <Text style = {styles.time}>{dish.time} min.</Text>
+      <View style={styles.time_box}>
+        <Text style={styles.time}>{dish.time} min.</Text>
       </View>
     </TouchableOpacity>
   )
@@ -66,6 +66,6 @@ const styles = StyleSheet.create({
   },
   time: {
     fontSize: 13,
-  }
+  },
 })
 export default OutStandingDishCard

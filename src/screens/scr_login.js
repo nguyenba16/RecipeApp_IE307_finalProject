@@ -1,25 +1,76 @@
 import React, { useState } from 'react'
-import { View, Text, Image, TouchableOpacity, Button, StyleSheet } from 'react-native'
+import { View, Text, Image, TouchableOpacity, StyleSheet, Alert } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import Input from '../components/Input'
+import axios from 'axios'
+
+const api = axios.create({
+  baseURL: 'http://192.168.56.1:5000',
+})
 
 export default function LoginScreen() {
   const navigation = useNavigation()
-  const [value, setValue] = useState()
-// Hàm xử lý onchange của input
-  const handleInput = () => {}
-//   hàm xử lý btn đăng nhập
-  const handleLogIn = () => {navigation.navigate('MainBottom')}
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [emailError, setEmailError] = useState('')
+  // Kiểm tra email hợp lệ
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }
+  const handleEmailChange = (value) => {
+    setEmail(value)
+    if (!validateEmail(value)) {
+      setEmailError('Invalid email format')
+    } else {
+      setEmailError('')
+    }
+  }
+  const handlePasswordChange = (value) => {
+    setPassword(value)
+  }
+  const handleLogIn = async () => {
+    if (!email || !password) {
+      Alert.alert('Lỗi', 'Vui lòng nhập thông tin email và mật khẩu của bạn!')
+      return
+    }
+    try {
+      const response = await api.post('/signin', { email, password })
+      if (response.status === 200) {
+        const { token, user } = response.data
+        Alert.alert('Thành công', 'Chúc mừng bạn đăng nhập thành công!')
+        console.log(user)
+        setEmail(""),
+        setPassword("")
+        navigation.navigate('MainBottom', { user, token })
+      }
+    } catch (error) {
+      setEmail('')
+      setPassword('')
+      Alert.alert('Lỗi', 'Mật khẩu hoặc email không đúng. Vui lòng nhập lại!')
+    }
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.maincontent}>
-        <Image source={require('../../assets/icons/logo.png')} style={styles.logo}></Image>
+        <Image source={require('../../assets/icons/logo.png')} style={styles.logo} />
         <View style={styles.heading}>
           <Text style={styles.heading_title}>Đăng nhập ngay</Text>
           <Text style={styles.desc}>Món ngon mỗi ngày</Text>
         </View>
-        <Input label='Số điện thoại' iconname='phone' value={value} onChangeText={handleInput} />
-        <Input label='Mật khẩu' iconname='key' value={value} onChangeText={handleInput} />
+        <Input
+          label='Email'
+          iconname='email'
+          value={email}
+          onChangeText={handleEmailChange}
+        />
+        <Input
+          label='Mật khẩu'
+          iconname='key'
+          value={password}
+          onChangeText={handlePasswordChange}
+        />
         <TouchableOpacity style={styles.btn} onPress={handleLogIn}>
           <Text style={styles.btnText}>Đăng nhập</Text>
         </TouchableOpacity>

@@ -4,14 +4,17 @@ const CommentList = ({ data }) => {
   return (
     <View style={styles.cmt_box}>
       {/* Đổi ngược thứ tự render */}
-      {data.slice().reverse().map((comment, index) => {
-        return (
-          <View key={index} style = {styles.cmt}>
-            <Text  style={styles.cmt_ownername}>{`<Tên người dùng>`}</Text>
-            <Text style={styles.cmt_text} >{comment}</Text>
-          </View>
-        )
-      })}
+      {data
+        .slice()
+        .reverse()
+        .map((comment, index) => {
+          return (
+            <View key={index} style={styles.cmt}>
+              <Text style={styles.cmt_ownername}>{`<Tên người dùng>`}</Text>
+              <Text style={styles.cmt_text}>{comment}</Text>
+            </View>
+          )
+        })}
     </View>
   )
 }
@@ -31,6 +34,6 @@ const styles = StyleSheet.create({
   cmt_ownername: {
     fontSize: 15,
     color: 'black',
-    fontWeight: 'bold'
-  }
+    fontWeight: 'bold',
+  },
 })

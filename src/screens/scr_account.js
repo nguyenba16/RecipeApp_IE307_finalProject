@@ -1,17 +1,19 @@
-import { View, Text, StyleSheet } from "react-native";
-
+import { View, Text, StyleSheet, Button } from 'react-native'
+import { useNavigation } from '@react-navigation/native'
 export default function ProfileScreen() {
-    return (
-        <View style = {styles.container}>
-            <Text>Acc Screen</Text>
-        </View>
-    )
+  const navigation = useNavigation()
+  return (
+    <View style={styles.container}>
+      <Text>Acc Screen</Text>
+      <Button title='Đăng xuất' onPress={() => navigation.navigate('LogIn')}></Button>
+    </View>
+  )
 }
 
 const styles = StyleSheet.create({
-    container: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100%',
-    }
+  container: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100%',
+  },
 })

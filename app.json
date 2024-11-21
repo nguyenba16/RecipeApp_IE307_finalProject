@@ -7,12 +7,10 @@
     "icon": "./assets/icons/logo.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "newArchEnabled": true
     },
-    "android": {
-    },
-    "web": {
-      
-    }
+    "android": {"newArchEnabled": true},
+    "web": {"newArchEnabled": true}
   }
 }

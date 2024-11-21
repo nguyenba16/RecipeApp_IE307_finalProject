@@ -1,15 +1,16 @@
 import React from 'react'
 import { View, StyleSheet, TextInput } from 'react-native'
 import Fontisto from '@expo/vector-icons/Fontisto'
-import AntDesign from '@expo/vector-icons/AntDesign'
 
-const Input = ({ label,iconname, value, onChangeText }) => {
+
+const Input = ({ label, iconname, value, onChangeText}) => {
+
   return (
     <View style={styles.text_input}>
       <View style={styles.input_icon}>
-        <Fontisto name= {iconname} size={25} color='gray' style={styles.icon} />
+        <Fontisto name={iconname} size={25} color='gray' style={styles.icon} />
       </View>
-      <TextInput placeholder = {label}></TextInput>
+      <TextInput placeholder={label} value={value} onChangeText={onChangeText}></TextInput>
     </View>
   )
 }
@@ -23,7 +24,7 @@ const styles = StyleSheet.create({
     height: 50,
     borderWidth: 1,
     borderColor: 'black',
-    marginTop: 15,
+    marginTop: 20,
     backgroundColor: '#fff',
     borderRadius: 5,
   },

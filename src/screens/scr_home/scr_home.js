@@ -112,9 +112,7 @@ export default function HomeScreen() {
             <Text style={styles.title}>Món nổi bật</Text>
             <FlatList
               data={outstandingDish}
-              renderItem={( {item} ) => (
-                <OutStandingDishCard dish={item} />
-              )}
+              renderItem={({ item }) => <OutStandingDishCard dish={item} />}
               horizontal
               showsHorizontalScrollIndicator={false}
               ref={flatListRef}
@@ -123,24 +121,6 @@ export default function HomeScreen() {
           {/* Món truyền thống */}
           <View style={styles.traditional_dish}>
             <Text style={styles.title}>Món ăn truyền thống</Text>
-            <FlatList
-              data={traditionalDish}
-              renderItem={({ item }) => (
-                <TouchableOpacity style={styles.card_traditional}>
-                  <Image source={item.img} style={styles.image_traditional} />
-                  <Text style={styles.dishName_traditional}>{item.name}</Text>
-                  <View style={styles.infoContainer_traditional}>
-                    <Text style={styles.time_traditional}>{item.time} min</Text>
-                  </View>
-                </TouchableOpacity>
-              )}
-              keyExtractor={(item) => item.id.toString()}
-              horizontal
-              pagingEnabled
-              showsHorizontalScrollIndicator={false}
-              onScroll={handleScroll}
-              ref={flatListRef}
-            />
             {/* Pagination Dots */}
             <View style={styles.pagination}>
               {traditionalDish.map((_, index) => (
@@ -158,7 +138,7 @@ export default function HomeScreen() {
             <FlatList
               data={categroryDish}
               renderItem={({ item }) => (
-                <TouchableOpacity style={styles.card_cate} onPress={() =>{}}>
+                <TouchableOpacity style={styles.card_cate} onPress={() => {}}>
                   <Image source={item.img} style={styles.image_cate} />
                   <View style={styles.overlay} />
                   <Text style={styles.dishName_cate}>{item.name}</Text>
@@ -278,7 +258,7 @@ const styles = StyleSheet.create({
   },
   categrory_box: {
     marginTop: 20,
-    marginBottom: 30
+    marginBottom: 30,
   },
   card_cate: {
     width: 231,
