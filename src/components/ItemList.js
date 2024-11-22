@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+// dùng để test connect BE
 import { View, Text, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
+import { useState, useEffect } from 'react';
 import { getUsers } from '../api/api';
 
 const ItemList = () => {
@@ -11,6 +12,7 @@ const ItemList = () => {
     const fetchData = async () => {
       try {
         const data = await getUsers();
+        console.log(data)
         setUsers(data);
       } catch (err) {
         setError('Error fetching users');
@@ -58,22 +60,9 @@ const ItemList = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-  },
-  title: {
-    fontSize: 24,
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  item: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-  center: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    height: 300,
+    backgroundColor: 'red',
+    width: 100,
   },
 });
 

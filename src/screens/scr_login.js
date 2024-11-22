@@ -1,9 +1,8 @@
 import React, { useState } from 'react'
-import { StatusBar } from 'expo-status-bar'
-import { View, Text, Image, TextInput, TouchableOpacity, Button, StyleSheet } from 'react-native'
+import { View, Text, Image, TouchableOpacity, Button, StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
-import Fontisto from '@expo/vector-icons/Fontisto'
 import Input from '../components/Input'
+
 export default function LoginScreen() {
   const navigation = useNavigation()
   const [value, setValue] = useState()
@@ -51,7 +50,7 @@ const styles = StyleSheet.create({
   logo: {
     width: 120,
     height: 120,
-    borderRadius: 5,
+    borderRadius: 100,
   },
   heading_title: {
     textAlign: 'center',
