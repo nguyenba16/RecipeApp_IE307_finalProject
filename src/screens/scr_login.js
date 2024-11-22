@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
   logo: {
     width: 120,
     height: 120,
-    borderRadius: '50%',
+    borderRadius: 5,
   },
   heading_title: {
     textAlign: 'center',
