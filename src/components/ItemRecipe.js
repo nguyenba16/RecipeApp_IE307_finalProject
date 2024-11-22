@@ -1,27 +1,27 @@
 import * as React from "react";
-import {StyleSheet, View, Image, Text} from "react-native";
+import {StyleSheet, View, Image, Text, TouchableOpacity} from "react-native";
 
-export default function ItemRecipe() {
+export default function ItemRecipe({Recipe}) {
   	
   	return (
-    	<View style={styles.container}>
+    	<TouchableOpacity style={styles.container}>
 			<View style={styles.background_info_reci }>
-				<Text style={styles.text_name_reci}>Tên món ăn Tên món ăn Tên món ăn</Text>
-				<Text style={styles.text_nl}>Nguyên liệu: Rong biển, nấm kim châm, thịt bằm, hành tím, dầu ăn, muối, hạt nêm </Text>
+				<Text style={styles.text_name_reci}>{Recipe.name}</Text>
+				<Text style={styles.text_nl}>{Recipe.ingredient}</Text>
 				<View style={styles.info_user}>
-					<Image style={styles.ava} resizeMode="cover" source={require('../../assets/bunbo.jpg')}/>
-					<Text style={styles.text_name_user}> Cao Quốc Kiệt</Text>
+					<Image style={styles.ava} resizeMode="cover" source={Recipe.ava_user}/>
+					<Text style={styles.text_name_user}> {Recipe.name_user}</Text>
 				</View>
 			</View>
 			
-			<Image style={styles.image} resizeMode="cover" source={require('../../assets/bunbo.jpg')}/>
-    	</View>);
+			<Image style={styles.image} resizeMode="cover" source={Recipe.img}/>
+    	</TouchableOpacity>);
 };
 
 const styles = StyleSheet.create({
 	container:{
 		margin: 10,
-		marginBottom: 5,
+		marginVertical: 5,
 		height: 165,
 		borderRadius: 20,
 		flexDirection: "row",
@@ -47,6 +47,8 @@ const styles = StyleSheet.create({
 		textAlign: "left",
 		color: "black",
 		width: 235,
+		height: 70,
+		textAlignVertical: "center",
 		justifyContent: "center"
 	},
 	text_nl:{
@@ -55,12 +57,14 @@ const styles = StyleSheet.create({
 		fontSize: 15,
 		width: 235,
 		left: 0,
+		textAlignVertical: "center",
 	},
 	info_user:{
 		flex: 2,
 		justifyContent: "flex-start",
 		alignContent: "center",
-		flexDirection: "row",	
+		flexDirection: "row",
+		alignItems: "center"	
 	},
 	ava:{
 		height: 30,

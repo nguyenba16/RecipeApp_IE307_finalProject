@@ -1,8 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import ItemRecipe from "../components/ItemRecipe";
-import { ScrollView } from "react-native-gesture-handler";
-import ListReci from "../components/scr_list_reci";
+import ListSavedRecipe from "./components/ListSavedRecipe";
+import ListSharedRecipe from "./components/ListSharedRecipe";
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -13,16 +12,16 @@ export default function ProfileScreen() {
                 <View style={[styles.user, styles.userLayout]}>
                     <Text style={[styles.name]}>Cao Quốc Kiệt</Text>
                     <Text style={[styles.email]}>caokiet@gmail.com</Text>
-                    <Image style={[styles.avatar]} resizeMode="cover" source={require('../../assets/icons/logo.png')}/>
+                    <Image style={[styles.avatar]} resizeMode="cover" source={require('../../../assets/icons/logo.png')}/>
                 </View>
                 <TouchableOpacity style={styles.backgroung_setting} onPress={()=>alert('Setting')}>
-                    <Image resizeMode="cover" source={require('../../assets/icons/setting.png')} />
+                    <Image resizeMode="cover" source={require('../../../assets/icons/setting.png')} />
                 </TouchableOpacity>
                 
             </View>
             <Tab.Navigator
                 screenOptions={{                    
-                    tabBarIndicatorStyle: { backgroundColor: '#ff9320', maxWidth: 125, marginLeft:40, height:2 },
+                    tabBarIndicatorStyle: { backgroundColor: '#ff9320'},
                     tabBarActiveTintColor: '#ff9320',
                     tabBarInactiveTintColor: 'black',
                     tabBarLabelStyle: { textTransform: "none",fontSize: 15, fontWeight: 'bold' },                        
@@ -30,12 +29,12 @@ export default function ProfileScreen() {
             >
                 <Tab.Screen
                     name="Công thức đã lưu"
-                    component={ListReci}
+                    component={ListSavedRecipe}
                     options={{ tabBarLabel: 'Công thức đã lưu '}}
                 />
                 <Tab.Screen
                     name="Công thức chia sẻ"
-                    component={ListReci}                    
+                    component={ListSharedRecipe}                    
                     options={{ tabBarLabel: 'Công thức chia sẻ' }}
                 />
             </Tab.Navigator> 
@@ -48,7 +47,6 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
     container:{
-        backgroundColor: "#FFFFFF",
         height: '100%',
         width: '100%',
     },

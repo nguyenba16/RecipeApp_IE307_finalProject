@@ -6,9 +6,11 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import HomeScreen from '../screens/scr_home/scr_home'
 import SearchScreen from '../screens/scr_search'
 import GroceriesScreen from '../screens/scr_groceries'
-import AccountScreen from '../screens/scr_account'
+import AccountScreen from '../screens/scr_account/scr_account'
 import DishDetail from '../screens/scr_dishDetails/scr_dishDetails'
+import { useNavigation } from '@react-navigation/native'
 const Tab = createBottomTabNavigator()
+
 
 export default function MainBottom() {
   return (
