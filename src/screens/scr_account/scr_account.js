@@ -9,11 +9,11 @@ export default function ProfileScreen() {
     return (
         <View style={styles.container} >
             <View style={styles.backgroundTitle}>
-                <View style={[styles.user, styles.userLayout]}>
+                <TouchableOpacity  style={[styles.user, styles.userLayout]}>
                     <Text style={[styles.name]}>Cao Quốc Kiệt</Text>
                     <Text style={[styles.email]}>caokiet@gmail.com</Text>
                     <Image style={[styles.avatar]} resizeMode="cover" source={require('../../../assets/icons/logo.png')}/>
-                </View>
+                </TouchableOpacity>
                 <TouchableOpacity style={styles.backgroung_setting} onPress={()=>alert('Setting')}>
                     <Image resizeMode="cover" source={require('../../../assets/icons/setting.png')} />
                 </TouchableOpacity>

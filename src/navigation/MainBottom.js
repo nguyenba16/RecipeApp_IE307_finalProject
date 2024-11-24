@@ -13,6 +13,9 @@ const Tab = createBottomTabNavigator()
 
 
 export default function MainBottom() {
+
+  const navigation = useNavigation();
+
   return (
     <Fragment>
       <Tab.Navigator
@@ -83,7 +86,7 @@ export default function MainBottom() {
       </Tab.Navigator>
 
       <View style={styles.addButtonContainer}>
-        <TouchableOpacity style={styles.addButton} onPress={() => alert('Add button pressed!')}>
+        <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate("NewRecipe")}>
           <Ionicons name='add' size={50} color='white' />
         </TouchableOpacity>
       </View>

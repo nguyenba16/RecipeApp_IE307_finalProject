@@ -43,8 +43,8 @@ export default function ListSharedRecipe() {
         <View style={styles.container}>
             <FlatList
               data={ListRecipe}
-              renderItem={({ item }) => (
-                <ItemRecipe Recipe={item}/>
+              renderItem={({ item, index}) => (
+                <ItemRecipe key={index} Recipe={item}/>
               )}
             />
         </View>

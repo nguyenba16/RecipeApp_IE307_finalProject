@@ -43,9 +43,10 @@ export default function ListSavedRecipe() {
         <View style={styles.container}>
             <FlatList
               data={ListRecipe}
-              renderItem={({ item }) => (
-                <ItemRecipe Recipe={item}/>
+              renderItem={({ item, index}) => (
+                <ItemRecipe key={index} Recipe={item}/>
               )}
+              showsHorizontalScrollIndicator={false}
             />
         </View>
     );
