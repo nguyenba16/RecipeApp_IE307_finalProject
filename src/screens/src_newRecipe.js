@@ -56,23 +56,19 @@ export default function NewRecipe({navigation}) {
         },
 
     ]
-    //Danh sách các nguyên liệu đã được thêm
-    const [ListAddIngre, setListAddIngre] =useState([])
-    //Thêm nguyên liệu vào danh sách
-    const AddIngredient = ((value) =>{
-        if(value!=null){
-            Alert.alert("đã thêm")
-            setListAddIngre([...ListAddIngre,value])
-        }
-    })    
+     
     //Nhận giá trị của tên món ăn
     const [nameDish, setNameDish] = useState();
+    
     //Nhận giá trị của mô tả
     const [desc, setDesc] = useState();
+
     //Nhận giá trị khẩu phần ăn 
     const [serving, setServing] = useState();
+
     //Nhận giá trị thời gian nấu 
     const [timecook, setTimecook] = useState();
+
     //Nhận mảng các nguyên liệu
     const [ingredient, setIngredient] = useState();     
     const pickerItems = ListIngre.map(item => ({ label: item.name, value: item.key, })); 
@@ -91,6 +87,20 @@ export default function NewRecipe({navigation}) {
         })
         setIngredient(value);
     };
+    //Danh sách các nguyên liệu đã được thêm
+    const [ListAddIngre, setListAddIngre] =useState([])
+    //Thêm nguyên liệu vào danh sách
+    const AddIngredient = ((value) =>{
+        if(value!=null){
+            const newIngredient = { id: value, quality: quality }; 
+            setListAddIngre([...ListAddIngre, newIngredient]); // Đặt lại các giá trị sau khi thêm 
+            setIngredient()
+            setQuality(0)
+        }
+    })   
+
+    //Nhận giá trị thứ tự bước
+    const [numberstep, setNumberstep] =useState(1)
     //Nhận giá trị của tiêu đề từng bước
     const [titleMethod, setTitleMethod] = useState()
     //Nhận đường dẫn của ảnh từng bước thực hiện
@@ -109,6 +119,16 @@ export default function NewRecipe({navigation}) {
     }
     //Nhận giá trị mô tả chi tiết cho từng bước
     const [detailMethod, setDetailMethod] = useState()
+    //Danh sách các bước thực hiện
+    const [method, setMethod] = useState([])
+    const addMethodStep = () => { 
+        const newStep = { numberstep: numberstep, title: titleMethod, image: imgMethod, detail: detailMethod, }; 
+        setMethod([...method, newStep]); // Đặt lại các giá trị sau khi thêm 
+        setNumberstep(numberstep+1)
+        setTitleMethod(''); 
+        setImgMethod(); 
+        setDetailMethod(''); 
+    };
     return (
         <SafeAreaView style = {styles.container}>
             {/* header */}
@@ -199,19 +219,6 @@ export default function NewRecipe({navigation}) {
                 
                 {/* Danh sách các nguyên liệu */}
                 <Text style={styles.title_ingredient}>Nguyên liệu</Text>
-                {
-                    ListAddIngre.map((value)=>{
-                        ListIngre.map((item)=>{
-                            if(item.key==value)
-                            {
-                                
-                            }
-                            return(
-                                <Text>{value}</Text>
-                            )
-                        })
-                    })
-                }
                 <View style={styles.ingredient}>
                     <View style={styles.background_img_ingre}>                        
                         <Image style={styles.img_ingre} source={imgIngre}/>     
@@ -246,7 +253,7 @@ export default function NewRecipe({navigation}) {
                 <View style={styles.methodcook}>
                     <View style={styles.title_method}>
                         {/* Thứ tự bước thực hiện */}
-                        <Text style={styles.method_number}>1</Text>
+                        <Text style={styles.method_number}>{numberstep}</Text>
                         {/* Nhập title bước thực hiện */}
                         <TextInput
                             style={styles.text_title_method}
@@ -276,7 +283,7 @@ export default function NewRecipe({navigation}) {
                             onChange={setDetailMethod}
                         />
                     </View>                    
-                    <TouchableOpacity style={styles.add_method}>
+                    <TouchableOpacity onPress={addMethodStep} style={styles.add_method}>
                         <Ionicons style={styles.icon_add}  name='add-outline' size={25} color='black' />
                         <Text style={styles.text_add}  >Thêm bước</Text>
                     </TouchableOpacity>
@@ -294,7 +301,6 @@ const styles = StyleSheet.create({
     },
     scroll: {
         width: "100%",
-        paddingHorizontal: 5,
     },
     title: {
         flexDirection: "row",
@@ -322,66 +328,81 @@ const styles = StyleSheet.create({
     touch_up_img: {
         height: 300,
         marginTop: 5,
-        borderColor: 'black',
+        borderColor: '#CFCFCF',
         borderStyle: 'dashed', 
         borderRadius: 5,
         borderWidth: 1,
         justifyContent: "center",
         alignItems: "center",
+        marginVertical: 10,
+        backgroundColor: "white"
     },
     text_upload: {
-        textAlign: "center"
+        textAlign: "center",
+        color: "#CFCFCF"
     },
     text_name: {
         fontSize: 22,
+        borderColor: "#CFCFCF",
         borderWidth: 1,
-        borderRadius: 5,
+        backgroundColor: "white",
+        borderRadius: 10,
         textAlign: "center",
-        marginTop: 10,
+        marginVertical: 10,
         padding: 5,
+        marginHorizontal: 15,
     },
     text_note: {
         height: 100,
         fontSize: 15,
         borderWidth: 1,
-        borderRadius: 5,
-        marginTop: 10,
+        borderRadius: 10,
+        borderColor: "#CFCFCF",
+        backgroundColor: "white",
+        marginVertical: 10,
         textAlign: "center",
         padding: 5,
+        margin: 10, 
+        marginHorizontal: 15,
     },
     serving: {
         flexDirection: "row",
-        marginTop: 20,
+        marginVertical: 10,
         justifyContent: "space-between",
-        alignItems: "center"
+        alignItems: "center",
+        margin: 10,         
+        marginHorizontal: 22
     },
     text_serving: {
         fontSize: 18,
-        color: "black"
+        color: "#9C9C9C",
     },
     inputtext_serving: {
         fontSize: 13,
         width: 170,
         height: 35,
         color: "black",
-        borderColor: "black",
+        borderColor: "#CFCFCF",
         borderWidth: 1,
         borderRadius: 5,
-        justifyContent: "center"
+        justifyContent: "center",        
+        backgroundColor: "white"
     },
     title_ingredient: {
         fontSize: 20,
         fontWeight: "bold",
         textAlign: "left",
         marginTop: 30,
+        marginHorizontal: 15
     },
     ingredient: {
-        width: "100%",
+        width: "90%",
         marginTop: 15,
         height: 40,
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
+        marginHorizontal: 20,
     },
     background_img_ingre: {
         width: "10%",
@@ -393,6 +414,8 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRightWidth: 0,
         paddingLeft: 10,
+        borderColor: "#CFCFCF",
+        backgroundColor: "white"
     },
     img_ingre:{
         height: 30,
@@ -406,6 +429,8 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         borderRightWidth: 0,
         borderLeftWidth: 0,
+        borderColor: "#CFCFCF",
+        backgroundColor: "white"
     },
     text_quality: {
         width: "20%",
@@ -416,7 +441,9 @@ const styles = StyleSheet.create({
         borderRightWidth: 0,
         paddingTop: 5,
         textAlign: "center",
-        justifyContent: "center"
+        justifyContent: "center",
+        borderColor: "#CFCFCF",
+        backgroundColor: "white"
     },
     text_dvi: {
         width: "20%",
@@ -427,6 +454,8 @@ const styles = StyleSheet.create({
         textAlignVertical: "center",
         borderWidth: 1,
         paddingLeft: 5,
+        borderColor: "#CFCFCF",
+        backgroundColor: "white"
     },
     add_ingre: {
         flexDirection: "row",
@@ -443,8 +472,9 @@ const styles = StyleSheet.create({
         marginLeft: 5,
     },
     methodcook: {
-        width: "100%",
+        width: "90%",
         marginTop: 10,
+        marginHorizontal: 20,
     },
     title_method: {
         flexDirection: "row",
@@ -455,18 +485,23 @@ const styles = StyleSheet.create({
         marginTop: 5,
     },
     method_number: {
-        width: "10%",
-        fontSize: 18,
+        width: "8%",
+        fontSize: 15,
+        height: "80%",
         backgroundColor: "#FF9320",
         textAlign: "center",
         borderRadius: 100,
-        textAlignVertical: "center"
+        textAlignVertical: "center",
+        color: "white",
+        margin: 3
     },
     text_title_method: {
         width: "88%",
         fontSize: 15,
         borderWidth: 1,
-        borderRadius: 5,
+        borderRadius: 5,        
+        borderColor: "#CFCFCF",
+        backgroundColor: "white"
     },
     upload_method: {
         width: "28%",
@@ -476,6 +511,8 @@ const styles = StyleSheet.create({
         borderStyle: 'dashed', 
         borderRadius: 5,
         borderWidth: 1,
+        borderColor: "#CFCFCF",
+        backgroundColor: "white"
     },
     text_method: {
         width: "58%",
@@ -483,6 +520,8 @@ const styles = StyleSheet.create({
         fontSize: 15,
         borderWidth: 1,
         borderRadius: 5,
+        borderColor: "#CFCFCF",
+        backgroundColor: "white"
     },
     add_method: {
         marginTop: 65,
