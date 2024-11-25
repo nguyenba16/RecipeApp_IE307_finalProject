@@ -1,6 +1,7 @@
 import { View, StyleSheet, Image, TextInput, TouchableOpacity} from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import ItemRecipe from "../components/ItemRecipe";
+import { useState } from "react";
 
 const ListRecipe = [
     {
@@ -37,6 +38,7 @@ const ListRecipe = [
     }
 ]
 export default function SearchScreen() {
+    const [textSearch, setTextSearch] = useState()
     return (
         <View style={styles.container} 
          >
@@ -45,6 +47,8 @@ export default function SearchScreen() {
                     <TextInput
                         style={styles.text_input}
                         placeholder="Tìm kiếm món ăn"
+                        value={textSearch}
+                        onChange={setTextSearch}
                     />
                     <TouchableOpacity style={styles.touch_icon}>
                         <Image style={styles.icon_search} source={require("../../assets/icons/search.png")}/>
