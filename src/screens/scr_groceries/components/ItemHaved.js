@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, Image } from 'react-native'
 import { useState } from 'react'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 
-export default function ItemHaved({ ingredient }) {
+export default function ItemHaved({ingredient }) {
   return (
     <View style={styles.container}>
       <Image style={styles.img} source={ingredient.img} />

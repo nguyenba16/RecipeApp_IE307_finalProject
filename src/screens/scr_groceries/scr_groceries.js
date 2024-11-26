@@ -22,10 +22,10 @@ export default function GroceriesScreen() {
         <TabGroceriy.Screen
           name='Nguyên liệu thiếu'
           component={ListIngreNeed}
-          options={{ tabBarLabel: 'Nguyên liệu thiếu ' }}
+          options={{ tabBarLabel: 'Nguyên liệu thiếu' }}
         />
         <TabGroceriy.Screen
-          name='Công thức chia sẻ'
+          name='Nguyên liệu có'
           component={ListIngreHaved}
           options={{ tabBarLabel: 'Nguyên liệu có' }}
         />

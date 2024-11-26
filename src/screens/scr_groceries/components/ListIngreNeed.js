@@ -56,8 +56,8 @@ export default function ListIngreNeed() {
   return (
     <View style={styles.container}>
       <ScrollView>
-        {ListIngre.map((recipe, index) => (
-          <ItemNeed key={index} ingredient={recipe} />
+        {ListIngre.map((recipe) => (
+          <ItemNeed key={recipe.key} ingredient={recipe} />
         ))}
       </ScrollView>
     </View>
