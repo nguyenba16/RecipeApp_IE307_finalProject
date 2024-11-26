@@ -6,15 +6,15 @@ import { useState } from "react";
 const ListRecipe = [
     {
         key: 1,
-        name: "Bún bò - Đặc sản Huế ",
-        ingredient: "Bún, Thịt bò, Rau muống, Giò heo, Chả lụa, Bún, Thịt bò, Rau muống, Giò heo, Chả lụa ",
+        name: "Bún bò - Đặc sản Huế Bún bò - Đặc sản Huế ",
+        ingredient: "Bún, Thịt bò, Rau muống, Giò heo, Chả lụa, Bún, Thịt bò, Rau muống, Giò heo, Chả lụa,Bún, Thịt bò, Rau muống, Giò heo, Chả lụa, Bún, Thịt bò, Rau muống, ",
         img: require("../../assets/bunbo.jpg"),
         ava_user: require("../../assets/icons/logo.png"),
         name_user: "Cao Quốc Kiệt"
     },
     {
         key: 2,
-        name: "Bún bò - Đặc sản Huế",
+        name: "Bún bò - Đặc sản",
         ingredient: "Bún, Thịt bò, Rau muống, Giò heo, Chả lụa ",
         img: require("../../assets/bunbo.jpg"),
         ava_user: require("../../assets/icons/logo.png"),
@@ -23,7 +23,7 @@ const ListRecipe = [
     {
         key: 3,
         name: "Bún bò - Đặc sản Huế",
-        ingredient: "Bún, Thịt bò, Rau muống, Giò heo, Chả lụa ",
+        ingredient: "Bún, Thịt bò, Rau muống, Giò heo, Chả lụa Bún, Thịt bò, Rau muống, Giò heo ",
         img: require("../../assets/bunbo.jpg"),
         ava_user: require("../../assets/icons/logo.png"),
         name_user: "Cao Quốc Kiệt"

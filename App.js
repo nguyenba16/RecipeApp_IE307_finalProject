@@ -6,6 +6,8 @@ import LoginScreen from './src/screens/scr_login';
 import SignUpScreen from './src/screens/scr_signup'
 import IntroScreen from './src/screens/scr_intro'
 import NewRecipe from './src/screens/src_newRecipe';
+import InfoUser from './src/screens/scr_account/scr_infouser';
+import DishDetail from './src/screens/scr_dishDetails/scr_dishDetails';
 const Stack = createStackNavigator();
 
 export default function App() {
@@ -15,7 +17,8 @@ export default function App() {
         <Stack.Screen name='LogIn' component={LoginScreen}/>
         <Stack.Screen name='SignUp' component={SignUpScreen}/>
         <Stack.Screen name="MainBottom" component={MainBottom} />
-        <Stack.Screen name="NewRecipe" component={NewRecipe} />
+        <Stack.Screen name="NewRecipe" component={NewRecipe} />  
+        <Stack.Screen name="InfoUser" component={DishDetail} />        
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -134,11 +134,14 @@ export default function NewRecipe({navigation}) {
             {/* header */}
             <View style={styles.title}>
                 {/* Back button */}
-                <TouchableOpacity 
-                    onPress={()=>navigation.goBack()}
-                >
-                    <Ionicons style={styles.back} name='arrow-back-outline' size={30} color='white' />
-                </TouchableOpacity>
+                <View style={{flexDirection: "row", }}>
+                    <TouchableOpacity 
+                        onPress={()=>navigation.goBack()}
+                    >
+                        <Ionicons name='arrow-back-outline' size={30} color='white' />
+                    </TouchableOpacity>
+                <Text style={styles.text_create}>Tạo công thức</Text>
+                </View>
                 
                 {/* Share button */}
                 <TouchableOpacity style={styles.touch_share}>
@@ -237,7 +240,7 @@ export default function NewRecipe({navigation}) {
                             placeholder="Số lượng"
                             value={quality}
                             onChange={setQuality}
-                        />
+                    />
                     {/* Đơn vị nguyên liệu */}
                     <Text style={styles.text_dvi} >{dvi}</Text>                    
                 </View>
@@ -271,7 +274,7 @@ export default function NewRecipe({navigation}) {
                         >
                         {imgMethod ? (<Image source={{ uri: photo }} style={{ width: "100%", height: "100%", borderRadius: 5, }} />):(
                             <View>
-                                <Ionicons style={{textAlign: "center"}} name='cloud-upload-outline' size={30} color='#FF9320'  />
+                                <Ionicons style={{textAlign: "center"}} name='cloud-upload-outline' size={30} color='#CFCFCF'  />
                             </View>                        
                         )}
                         </TouchableOpacity>
@@ -298,6 +301,7 @@ const styles = StyleSheet.create({
         height: '100%',
         alignItems: "center",
         justifyContent: "center",
+        backgroundColor: "white",        
     },
     scroll: {
         width: "100%",
@@ -311,13 +315,21 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         paddingHorizontal: 10
     },
+    text_create:{
+        marginLeft: 10, 
+        alignSelf:"center", 
+        fontSize: 18, 
+        color: "white", 
+        fontWeight: "bold"
+    },
     touch_share: {
         backgroundColor: "white",
-        height: 40,
+        height: 35,
         width: 100,
         borderRadius: 10,
         justifyContent: "center",
-        alignItems: "center"
+        alignItems: "center",
+        fontSize: 15,
     },
     text_touch: {
         fontSize: 18,
@@ -335,7 +347,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         marginVertical: 10,
-        backgroundColor: "white"
+        backgroundColor: "#F5F5F5"
     },
     text_upload: {
         textAlign: "center",
@@ -343,9 +355,7 @@ const styles = StyleSheet.create({
     },
     text_name: {
         fontSize: 22,
-        borderColor: "#CFCFCF",
-        borderWidth: 1,
-        backgroundColor: "white",
+        backgroundColor: "#F5F5F5",
         borderRadius: 10,
         textAlign: "center",
         marginVertical: 10,
@@ -355,10 +365,8 @@ const styles = StyleSheet.create({
     text_note: {
         height: 100,
         fontSize: 15,
-        borderWidth: 1,
         borderRadius: 10,
-        borderColor: "#CFCFCF",
-        backgroundColor: "white",
+        backgroundColor: "#F5F5F5",
         marginVertical: 10,
         textAlign: "center",
         padding: 5,
@@ -375,18 +383,16 @@ const styles = StyleSheet.create({
     },
     text_serving: {
         fontSize: 18,
-        color: "#9C9C9C",
+        color: "black",
     },
     inputtext_serving: {
         fontSize: 13,
         width: 170,
         height: 35,
         color: "black",
-        borderColor: "#CFCFCF",
-        borderWidth: 1,
         borderRadius: 5,
         justifyContent: "center",        
-        backgroundColor: "white"
+        backgroundColor: "#F5F5F5"
     },
     title_ingredient: {
         fontSize: 20,
@@ -398,64 +404,47 @@ const styles = StyleSheet.create({
     ingredient: {
         width: "90%",
         marginTop: 15,
-        height: 40,
+        height: 60,
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        marginHorizontal: 20,
+        marginHorizontal: 20,        
+        backgroundColor: "#F5F5F5",
     },
     background_img_ingre: {
         width: "10%",
         height: 40,
-        alignItems: "center",
-        justifyContent: "center",        
-        borderStartStartRadius: 5,
-        borderBottomStartRadius:5,
-        borderWidth: 1,
-        borderRightWidth: 0,
+        justifyContent: "center",
         paddingLeft: 10,
-        borderColor: "#CFCFCF",
-        backgroundColor: "white"
+        backgroundColor: "#F5F5F5",
+        textAlignVertical: "center"
     },
     img_ingre:{
         height: 30,
         width: 30,
     },
     text_name_ingre: {
-        borderWidth: 1,
-        height: 40,
         width: "50%",
         fontSize: 15,
-        justifyContent: "center",
-        borderRightWidth: 0,
-        borderLeftWidth: 0,
-        borderColor: "#CFCFCF",
-        backgroundColor: "white"
+        alignContent: "center",
+        textAlign: "center",
+        height: 60,
     },
     text_quality: {
         width: "20%",
-        fontSize: 15,
-        height: 40,
-        alignContent: "center",
-        borderWidth: 1,
-        borderRightWidth: 0,
-        paddingTop: 5,
-        textAlign: "center",
-        justifyContent: "center",
-        borderColor: "#CFCFCF",
-        backgroundColor: "white"
+        fontSize: 16,
+        height: 60,
+        textAlign: "right",               
+        textAlignVertical: "center"
     },
     text_dvi: {
         width: "20%",
-        fontSize: 15,
-        height: 40,
+        fontSize: 16,
         borderBottomRightRadius: 5,
         borderTopRightRadius: 5,
-        textAlignVertical: "center",
-        borderWidth: 1,
         paddingLeft: 5,
-        borderColor: "#CFCFCF",
-        backgroundColor: "white"
+        height: 60,
+        textAlignVertical: "center"
     },
     add_ingre: {
         flexDirection: "row",
@@ -498,33 +487,32 @@ const styles = StyleSheet.create({
     text_title_method: {
         width: "88%",
         fontSize: 15,
-        borderWidth: 1,
-        borderRadius: 5,        
-        borderColor: "#CFCFCF",
-        backgroundColor: "white"
+        borderRadius: 5, 
+        backgroundColor: "#F5F5F5"
     },
     upload_method: {
         width: "28%",
         height: 100,
         justifyContent: "center",
-        borderColor: 'black',
         borderStyle: 'dashed', 
         borderRadius: 5,
         borderWidth: 1,
         borderColor: "#CFCFCF",
-        backgroundColor: "white"
+        backgroundColor: "#F5F5F5",
     },
     text_method: {
         width: "58%",
         height: 100,
         fontSize: 15,
-        borderWidth: 1,
         borderRadius: 5,
-        borderColor: "#CFCFCF",
-        backgroundColor: "white"
+        backgroundColor: "#F5F5F5",
+        textAlignVertical: "top",
+        textAlign: "center",
+        paddingLeft: 10,
     },
     add_method: {
-        marginTop: 65,
+        marginTop: 70,
+        marginBottom: 30,
         flexDirection: "row",
     }
 });

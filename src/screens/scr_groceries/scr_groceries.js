@@ -1,84 +1,37 @@
 import { View, Text, StyleSheet } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
-import ItemHaved from "./components/ItemHaved";
-import ItemNeed from "./components/ItemNeed";
-export default function GroceriesScreen() {
-    const ListIngre = [
-        {
-            key: 1,
-            name: "Thịt",
-            img: require('../../../assets/icons/logo.png') ,
-            quality: 3,
-            dvi: "kg"
-        },
-        {
-            key: 2,
-            name: "Cá",
-            img: require('../../../assets/icons/logo.png') ,
-            quality: 3,
-            dvi: "kg"
-        },
-        {
-            key: 3,
-            name: "Rau",
-            img: require('../../../assets/icons/logo.png') ,
-            quality: 3,
-            dvi: "kg"
-        },
-        {
-            key: 4,
-            name: "Đường",
-            img: require('../../../assets/icons/logo.png') ,
-            quality: 3,
-            dvi: "kg"
-        },
-        {
-            key: 5,
-            name: "Cá",
-            img: require('../../../assets/icons/logo.png') ,
-            quality: 3,
-            dvi: "kg"
-        },
-        {
-            key: 6,
-            name: "Rau",
-            img: require('../../../assets/icons/logo.png') ,
-            quality: 3,
-            dvi: "kg"
-        },
-        {
-            key: 7,
-            name: "Đường",
-            img: require('../../../assets/icons/logo.png') ,
-            quality: 3,
-            dvi: "kg"
-        },
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import ListIngreHaved from "./components/ListIngreHaved";
+import ListIngreNeed from "./components/ListIngreNeed";
 
-    ]
+const TabGroceriy = createMaterialTopTabNavigator();
+
+export default function GroceriesScreen() {
+
     return (
-        <View style = {styles.container}>
-            <View style={styles.backgroundTitle}>
-                <Text style={styles.text_title}>Giỏ hàng của tôi</Text>
-            </View>
-            <View style={{flex: 1}}>
-                <Text style={styles.text_title_ingre}>Nguyên liệu cần</Text>
-                <ScrollView style={styles.background_list}>
-                {
-                    ListIngre.map((item, index) => (
-                        <ItemNeed key={index} ingredient={item}/>
-                    ))
-                }
-                </ScrollView>
-                <Text style={styles.text_title_ingre}>Nguyên liệu đã có</Text>
-                <ScrollView style={styles.background_list}>
-                {
-                    ListIngre.map((item, index) => (
-                        <ItemHaved key={index} ingredient={item}/>
-                    ))
-                }
-                </ScrollView>
-            </View>
+      <View style={styles.container}>
+        <View style={styles.backgroundTitle}>
+          <Text style={styles.text_title}>Giỏ hàng của tôi</Text>
         </View>
+        <TabGroceriy.Navigator
+          screenOptions={{
+            tabBarIndicatorStyle: { backgroundColor: '#ff9320' },
+            tabBarActiveTintColor: '#ff9320',
+            tabBarInactiveTintColor: 'black',
+            tabBarLabelStyle: { textTransform: 'none', fontSize: 15, fontWeight: 'bold' },
+          }}
+        >
+          <TabGroceriy.Screen
+            name='Nguyên liệu thiếu'
+            component={ListIngreNeed}
+            options={{ tabBarLabel: 'Nguyên liệu thiếu ' }}
+          />
+          <TabGroceriy.Screen
+            name='Công thức chia sẻ'
+            component={ListIngreHaved}
+            options={{ tabBarLabel: 'Nguyên liệu có' }}
+          />
+        </TabGroceriy.Navigator>
+      </View>
     )
 }
 

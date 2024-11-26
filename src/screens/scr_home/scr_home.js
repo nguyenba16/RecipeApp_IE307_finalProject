@@ -179,7 +179,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-
   imageBackground: {
     height: 415,
     padding: 20,

@@ -2,14 +2,18 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import ListSavedRecipe from "./components/ListSavedRecipe";
 import ListSharedRecipe from "./components/ListSharedRecipe";
+import { useNavigation } from "@react-navigation/native";
 
 const Tab = createMaterialTopTabNavigator();
 
-export default function ProfileScreen() {
+export default function ProfileScreen() {  
+
+    const navigation = useNavigation();
+
     return (
         <View style={styles.container} >
             <View style={styles.backgroundTitle}>
-                <TouchableOpacity  style={[styles.user, styles.userLayout]}>
+                <TouchableOpacity onPress={()=>navigation.navigate('InfoUser')} style={[styles.user, styles.userLayout]}>
                     <Text style={[styles.name]}>Cao Quốc Kiệt</Text>
                     <Text style={[styles.email]}>caokiet@gmail.com</Text>
                     <Image style={[styles.avatar]} resizeMode="cover" source={require('../../../assets/icons/logo.png')}/>

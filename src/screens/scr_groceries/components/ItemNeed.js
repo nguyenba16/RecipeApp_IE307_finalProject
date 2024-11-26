@@ -25,11 +25,12 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         paddingHorizontal: 20,
         borderRadius: 10,
-        paddingTop: 10,
-        paddingBottom: 8,
-        marginVertical: 5,
+        paddingTop: 15,
+        paddingBottom: 10,
+        marginHorizontal: 10,
         borderColor: "#E8E8E8",
         borderBottomWidth: 1,
+        backgroundColor: "white",
     },
     img: {
         height: 30,
@@ -52,6 +53,6 @@ const styles = StyleSheet.create({
     },
     check: {
         marginLeft: 30,
-        paddingTop: 3,
+        paddingTop: 2,
     }
 })

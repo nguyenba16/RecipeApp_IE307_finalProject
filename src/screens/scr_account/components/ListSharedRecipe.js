@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react'
 import { StyleSheet, View } from 'react-native';
 import ItemRecipe from '../../../components/ItemRecipe';
-import { FlatList } from 'react-native-gesture-handler';
+import { ScrollView } from 'react-native';
 
 const ListRecipe = [
     {
@@ -41,12 +41,13 @@ const ListRecipe = [
 export default function ListSharedRecipe() {
     return(
         <View style={styles.container}>
-            <FlatList
-              data={ListRecipe}
-              renderItem={({ item, index}) => (
-                <ItemRecipe key={index} Recipe={item}/>
-              )}
-            />
+            <ScrollView>
+            {
+                ListRecipe.map((recipe) => (
+                    <ItemRecipe  key={recipe.key} Recipe={recipe} />
+                ))
+            }
+            </ScrollView>
         </View>
     );
 }
