@@ -42,10 +42,8 @@ function ProfileStack() {
   )
 }
 
-
 export default function MainBottom() {
-
-  const navigation = useNavigation();
+  const navigation = useNavigation()
 
   return (
     <Fragment>
@@ -103,7 +101,7 @@ export default function MainBottom() {
       </Tab.Navigator>
 
       <View style={styles.addButtonContainer}>
-        <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate("NewRecipe")}>
+        <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate('NewRecipe')}>
           <Ionicons name='add' size={50} color='white' />
         </TouchableOpacity>
       </View>

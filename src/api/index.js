@@ -349,75 +349,57 @@ app.get('/detailpage/:id', async (req, res) => {
 
 // Api xử lý like
 app.post('/like/:recipeId', async (req, res) => {
-  const { userId } = req.body;
-  const { recipeId } = req.params;
+  const { userId } = req.body
+  const { recipeId } = req.params
   try {
-    const recipe = await Recipe.findById(recipeId);
-    if (!recipe) {
-      return res.status(404).json({ success: false, message: 'Món ăn không tồn tại' });
-    }
-    const hasLiked = recipe.likeUsers.includes(userId);
+    const recipe = await Recipe.findById(recipeId)
+    const hasLiked = recipe.likeUsers.includes(userId)
     if (hasLiked) {
-      await Recipe.findByIdAndUpdate(
-        recipeId,
-        { $pull: { likeUsers: userId } },
-        { new: true }
-      );
-      return res.status(200).json({ success: false, message: 'Đã bỏ like' });
+      await Recipe.findByIdAndUpdate(recipeId, { $pull: { likeUsers: userId } }, { new: true })
+      return res.status(200).json({ success: false, message: 'Đã bỏ like' })
     } else {
-      await Recipe.findByIdAndUpdate(
-        recipeId,
-        { $push: { likeUsers: userId } },
-        { new: true }
-      );
-      return res.status(200).json({ success: true, message: 'Đã like' });
+      await Recipe.findByIdAndUpdate(recipeId, { $push: { likeUsers: userId } }, { new: true })
+      return res.status(200).json({ success: true, message: 'Đã like' })
     }
   } catch (error) {
-    console.error('Lỗi server:', error);
-    return res.status(500).json({ success: false, message: 'Có lỗi xảy ra khi xử lý yêu cầu', error: error.message });
+    console.error('Lỗi server:', error)
+    return res
+      .status(500)
+      .json({ success: false, message: 'Có lỗi xảy ra khi xử lý yêu cầu', error: error.message })
   }
-});
+})
 
 // Api xử lý save
 app.post('/save/:recipeId', async (req, res) => {
-  const { userId } = req.body;
-  const { recipeId } = req.params;
+  const { userId } = req.body
+  const { recipeId } = req.params
   try {
-    const recipe = await Recipe.findById(recipeId);
-    if (!recipe) {
-      return res.status(404).json({ success: false, message: 'Món ăn không tồn tại' });
-    }
-    const hasSaved = recipe.saveUsers.includes(userId);
+    const recipe = await Recipe.findById(recipeId)
+    const hasSaved = recipe.saveUsers.includes(userId)
     if (hasSaved) {
-      await Recipe.findByIdAndUpdate(
-        recipeId,
-        { $pull: { saveUsers: userId } },
-        { new: true }
-      );
-      return res.status(200).json({ success: false, message: 'Đã bỏ save' });
+      await Recipe.findByIdAndUpdate(recipeId, { $pull: { saveUsers: userId } }, { new: true })
+      return res.status(200).json({ success: false, message: 'Đã bỏ save' })
     } else {
-      await Recipe.findByIdAndUpdate(
-        recipeId,
-        { $push: { saveUsers: userId } },
-        { new: true }
-      );
-      return res.status(200).json({ success: true, message: 'Đã save' });
+      await Recipe.findByIdAndUpdate(recipeId, { $push: { saveUsers: userId } }, { new: true })
+      return res.status(200).json({ success: true, message: 'Đã save' })
     }
   } catch (error) {
-    console.error('Lỗi server:', error);
-    return res.status(500).json({ success: false, message: 'Có lỗi xảy ra khi xử lý yêu cầu', error: error.message });
-  }
-});
-
-// Api categroies
-app.post('/categrories', async (req, res) => {
-  const categroryType = req.body
-  try {
-    const recipe = 
-  } catch (error) {
-    console.error("Error: ", error)
+    console.error('Lỗi server:', error)
+    return res
+      .status(500)
+      .json({ success: false, message: 'Có lỗi xảy ra khi xử lý yêu cầu', error: error.message })
   }
 })
+
+// Api categroies
+// app.post('/categrories', async (req, res) => {
+//   const categroryType = req.body
+//   try {
+//     const recipe =
+//   } catch (error) {
+//     console.error("Error: ", error)
+//   }
+// })
 const PORT = 5000
 app.listen(PORT, () => {
   console.log(`Server running at http://192.168.1.13:${PORT}`)

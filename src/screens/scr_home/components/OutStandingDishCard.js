@@ -1,13 +1,8 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
 import { useState } from 'react'
-import Icon from 'react-native-vector-icons/FontAwesome'
 import { useNavigation } from '@react-navigation/native'
 
 const OutStandingDishCard = ({ dish }) => {
-  const [liked, setLiked] = useState(false)
-  const handleLike = () => {
-    setLiked(!liked)
-  }
   const navigation = useNavigation()
   const handleNavtoDetail = () => {
     navigation.navigate('DishDetail', { dishID: dish._id })
@@ -16,17 +11,19 @@ const OutStandingDishCard = ({ dish }) => {
     <TouchableOpacity style={styles.dish_box} onPress={handleNavtoDetail}>
       <View style={styles.imageContainer}>
         <Image source={{ uri: dish.imgURL }} style={styles.ost_img} />
-        {/* Overlay to darken the image */}
         <View style={styles.overlay} />
       </View>
-      <TouchableOpacity style={styles.btn_love} onPress={handleLike}>
-        <Icon name={liked ? 'heart' : 'heart-o'} size={25} />
-      </TouchableOpacity>
       <Text style={styles.dish_name} numberOfLines={2}>
         {dish.nameDish}
       </Text>
-      <View style={styles.time_box}>
-        <Text style={styles.time}>{dish.cookingTime} min.</Text>
+
+      <View style={styles.head}>
+        <View style={styles.time_box}>
+          <Text style={styles.head_text}>{dish.cookingTime} min.</Text>
+        </View>
+        <View style={styles.cate_box}>
+          <Text style={styles.head_text}>{dish.categroryType}</Text>
+        </View>
       </View>
     </TouchableOpacity>
   )
@@ -51,7 +48,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.15)',
+    backgroundColor: 'rgba(0, 0, 0, 0.2)',
     borderRadius: 20,
   },
   dish_name: {
@@ -75,17 +72,32 @@ const styles = StyleSheet.create({
     top: 10,
   },
   time_box: {
-    position: 'absolute',
-    padding: 6,
-    left: 10,
-    top: 10,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
     backgroundColor: '#FCF5D7',
     borderRadius: 1000,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  time: {
-    fontSize: 13,
+  cate_box: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    backgroundColor: '#e7f5dc',
+    borderRadius: 1000,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  head: {
+    position: 'absolute',
+    left: 10,
+    top: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 10,
+  },
+  head_text: {
+    fontSize: 12,
   },
 })
 

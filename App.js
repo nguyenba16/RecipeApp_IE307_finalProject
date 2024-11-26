@@ -5,6 +5,7 @@ import MainBottom from './src/navigation/MainBottom'
 import LoginScreen from './src/screens/scr_login'
 import SignUpScreen from './src/screens/scr_signup'
 import IntroScreen from './src/screens/scr_intro'
+import InfoUser from './src/screens/scr_account/scr_infouser'
 import { AuthProvider } from './src/components/AuthContext'
 import NewRecipe from './src/screens/src_newRecipe'
 const Stack = createStackNavigator()
@@ -18,6 +19,7 @@ export default function App() {
           <Stack.Screen name='SignUp' component={SignUpScreen} />
           <Stack.Screen name='MainBottom' component={MainBottom} />
           <Stack.Screen name='NewRecipe' component={NewRecipe} />
+          <Stack.Screen name='InfoUser' component={InfoUser} />
         </Stack.Navigator>
       </NavigationContainer>
     </AuthProvider>

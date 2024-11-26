@@ -9,7 +9,7 @@ const api = axios.create({
 })
 
 export default function ProfileScreen() {
-  const [recipes, setRecipes] = useState([]) 
+  const [recipes, setRecipes] = useState([])
   const navigation = useNavigation()
 
   // Function to fetch data

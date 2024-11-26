@@ -14,6 +14,8 @@ import OutStandingDishCard from './components/OutStandingDishCard'
 import axios from 'axios'
 import { AuthContext } from '../../components/AuthContext'
 import TraditionalDishCard from './components/TraditionalDishCard'
+import { useNavigation } from '@react-navigation/native'
+import CategroryCard from './components/CategroryCard'
 
 const api = axios.create({
   baseURL: 'http://192.168.56.1:5000',
@@ -21,33 +23,22 @@ const api = axios.create({
 
 const categroryDish = [
   {
-    name: 'Châu Á',
+    name: 'Miền Trung',
     img: require('../../../assets/images/scr_home/cate_img1.png'),
   },
   {
-    name: 'Châu Âu',
+    name: 'Miền Nam',
     img: require('../../../assets/images/scr_home/cate_img2.png'),
   },
   {
-    name: 'Món chay',
-    img: require('../../../assets/images/scr_home/cate_img3.png'),
-  },
-  {
-    name: 'Châu Á',
-    img: require('../../../assets/images/scr_home/cate_img1.png'),
-  },
-  {
-    name: 'Châu Âu',
-    img: require('../../../assets/images/scr_home/cate_img2.png'),
-  },
-  {
-    name: 'Món chay',
+    name: 'Miền Bắc',
     img: require('../../../assets/images/scr_home/cate_img3.png'),
   },
 ]
 
 export default function HomeScreen() {
   const { user } = useContext(AuthContext)
+  const navigation = useNavigation()
   const [currentIndex, setCurrentIndex] = useState(0)
   const [outstandingDishes, setOutstandingDishes] = useState([])
   const [traditionalDish, setTraditionalDish] = useState([])
@@ -137,13 +128,7 @@ export default function HomeScreen() {
             <Text style={styles.title}>Món ăn chủ đề</Text>
             <FlatList
               data={categroryDish}
-              renderItem={({ item }) => (
-                <TouchableOpacity style={styles.card_cate} onPress={() => {}}>
-                  <Image source={item.img} style={styles.image_cate} />
-                  <View style={styles.overlay} />
-                  <Text style={styles.dishName_cate}>{item.name}</Text>
-                </TouchableOpacity>
-              )}
+              renderItem={({ item }) => <CategroryCard item={item} />}
               horizontal
               showsHorizontalScrollIndicator={false}
               ref={flatListRef}
@@ -159,7 +144,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-
   imageBackground: {
     height: 415,
     padding: 20,
@@ -262,27 +246,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 30,
   },
-  card_cate: {
-    width: 231,
-    height: 310,
-    marginLeft: 20,
-    position: 'relative',
-  },
-  image_cate: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 10,
-  },
-  dishName_cate: {
-    position: 'absolute',
-    bottom: 20,
-    left: 0,
-    right: 0,
-    textAlign: 'center',
-    color: '#fff',
-    fontWeight: '800',
-    fontSize: 25,
-  },
+
   overlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0, 0, 0, 0.15)',
