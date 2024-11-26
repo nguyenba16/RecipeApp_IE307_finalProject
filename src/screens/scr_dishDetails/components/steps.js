@@ -6,13 +6,16 @@ export default function Steps({ cookingSteps }) {
     <View>
       {cookingSteps.map((step, index) => {
         return (
-          <View key={step.id} style={styles.stepCard}>
+          <View key={index} style={styles.stepCard}>
             <View style={styles.head}>
-              <Text style={styles.count_step}>Bước {step.id} </Text>
+              <Text style={styles.title}>
+                {' '}
+                Bước {index + 1}/{cookingSteps.length}: {step.stepTitle}
+              </Text>
             </View>
-            <Image source={step.img_step} style={styles.img_step}></Image>
-            <Text style={styles.desc_box}>
-              <Text style={styles.title}>Mô tả:</Text> {step.desc_step}
+            <Image source={{ uri: step.img_step }} style={styles.img_step}></Image>
+            <Text style={styles.info}>
+              <Text style={styles.title_desc}>Mô tả:</Text> {step.step_desc}
             </Text>
           </View>
         )
@@ -25,12 +28,11 @@ const styles = StyleSheet.create({
   stepCard: { marginTop: 20 },
   head: {
     backgroundColor: '#FFEDD7',
-    height: 60,
+    padding: 20,
     justifyContent: 'center',
-    paddingLeft: 20,
   },
 
-  count_step: {
+  title: {
     fontSize: 20,
     fontWeight: '700',
   },
@@ -42,11 +44,11 @@ const styles = StyleSheet.create({
     height: 236,
     resizeMode: 'cover',
   },
-  title: {
+  title_desc: {
     fontSize: 15,
     fontWeight: '700',
   },
-  desc_box: {
+  info: {
     padding: 20,
   },
 })

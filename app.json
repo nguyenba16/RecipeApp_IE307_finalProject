@@ -10,7 +10,7 @@
       "supportsTablet": true,
       "newArchEnabled": true
     },
-    "android": {"newArchEnabled": true},
-    "web": {"newArchEnabled": true}
+    "android": { "newArchEnabled": true },
+    "web": { "newArchEnabled": true }
   }
 }

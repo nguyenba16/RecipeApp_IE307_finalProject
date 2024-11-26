@@ -2,9 +2,7 @@ import React from 'react'
 import { View, StyleSheet, TextInput } from 'react-native'
 import Fontisto from '@expo/vector-icons/Fontisto'
 
-
-const Input = ({ label, iconname, value, onChangeText}) => {
-
+const Input = ({ label, iconname, value, onChangeText }) => {
   return (
     <View style={styles.text_input}>
       <View style={styles.input_icon}>

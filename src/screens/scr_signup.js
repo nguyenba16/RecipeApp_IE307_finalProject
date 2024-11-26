@@ -34,25 +34,25 @@ export default function SignUpScreen() {
 
   const handleSignUp = async () => {
     if (!userName || !phoneNumber || !email || !password || !reEnterPassword) {
-      alert('Vui lòng điền đầy đủ thông tin!');
-      return;
+      alert('Vui lòng điền đầy đủ thông tin!')
+      return
     }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const phoneRegex = /^[0-9]{10,11}$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const phoneRegex = /^[0-9]{10,11}$/
     if (!emailRegex.test(email)) {
-      setEmail("")
-      alert('Vui lòng nhập lại Email của bạn!');
-      return;
+      setEmail('')
+      alert('Vui lòng nhập lại Email của bạn!')
+      return
     }
     if (!phoneRegex.test(phoneNumber)) {
-      setPhoneNumber("")
-      alert('Vui lòng nhập lại số điện thoại của bạn!');
-      return;
+      setPhoneNumber('')
+      alert('Vui lòng nhập lại số điện thoại của bạn!')
+      return
     }
     if (password !== reEnterPassword) {
-      setReEnterPassword("")
-      alert('Mật khẩu nhập lại chưa giống!');
-      return;
+      setReEnterPassword('')
+      alert('Mật khẩu nhập lại chưa giống!')
+      return
     }
     try {
       const response = await api.post('/signup', {
@@ -60,20 +60,20 @@ export default function SignUpScreen() {
         phone: phoneNumber,
         password,
         userName,
-        avatar_URL: '', 
-      });
-  
+        avatar_URL: '',
+      })
+
       if (response.status === 201) {
-        alert('Sign Up successfully!');
-        navigation.navigate('LogIn');
+        alert('Sign Up successfully!')
+        navigation.navigate('LogIn')
       } else {
-        alert('Sign Up failed, please try again!');
+        alert('Sign Up failed, please try again!')
       }
     } catch (error) {
-      console.error('Sign Up Error:', error);
-      alert('Error during sign up. Please try again later.');
+      console.error('Sign Up Error:', error)
+      alert('Error during sign up. Please try again later.')
     }
-  };
+  }
   return (
     <View style={styles.container}>
       <View style={styles.maincontent}>

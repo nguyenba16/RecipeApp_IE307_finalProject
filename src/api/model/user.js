@@ -8,5 +8,5 @@ const UserSchema = new mongoose.Schema({
   avatar_URL: { type: String },
 })
 
-const User = mongoose.model('User', UserSchema, 'Users');
+const User = mongoose.model('User', UserSchema, 'Users')
 export default User

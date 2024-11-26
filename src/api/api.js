@@ -15,12 +15,12 @@ export const getUsers = async () => {
 }
 
 // Search
-export const searchDish = async(nameDish) => {
+export const searchDish = async (nameDish) => {
   try {
-    const response = await api.get('/search', { params: { nameDish }})
+    const response = await api.get('/search', { params: { nameDish } })
     return response.data
   } catch (err) {
-    console.error("Error search: ", err)
+    console.error('Error search: ', err)
     return []
   }
 }

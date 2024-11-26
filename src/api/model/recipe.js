@@ -6,6 +6,7 @@ const recipeSchema = new mongoose.Schema({
   likeNumber: { type: Number, require: true },
   saveNumber: { type: Number, require: true },
   cookingTime: { type: Number, require: true },
+  servingNumber: { type: Number, require: true },
   desc: { type: String, required: true },
   ingredientList: [
     {
@@ -13,11 +14,10 @@ const recipeSchema = new mongoose.Schema({
       quality: { type: Number, require: true },
     },
   ],
-  stepNumbers: { type: Number, require: true },
   cookingSteps: [
     {
+      img_step: { type: String, require: true },
       stepTitle: { type: String, required: true },
-      ingredients: { type: String, required: true },
       step_desc: { type: String, required: true },
     },
   ],

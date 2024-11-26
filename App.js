@@ -5,16 +5,19 @@ import MainBottom from './src/navigation/MainBottom'
 import LoginScreen from './src/screens/scr_login'
 import SignUpScreen from './src/screens/scr_signup'
 import IntroScreen from './src/screens/scr_intro'
+import { AuthProvider } from './src/components/AuthContext'
 const Stack = createStackNavigator()
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName='LogIn' screenOptions={{ headerShown: false }}>
-        <Stack.Screen name='LogIn' component={LoginScreen} />
-        <Stack.Screen name='SignUp' component={SignUpScreen} />
-        <Stack.Screen name='MainBottom' component={MainBottom} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <AuthProvider>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName='LogIn' screenOptions={{ headerShown: false }}>
+          <Stack.Screen name='LogIn' component={LoginScreen} />
+          <Stack.Screen name='SignUp' component={SignUpScreen} />
+          <Stack.Screen name='MainBottom' component={MainBottom} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </AuthProvider>
   )
 }

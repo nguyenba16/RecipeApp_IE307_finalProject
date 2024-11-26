@@ -1,9 +1,10 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { View, Text, Image, TouchableOpacity, StyleSheet, Alert } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import Input from '../components/Input'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import axios from 'axios'
-
+import { AuthContext } from '../components/AuthContext'
 const api = axios.create({
   baseURL: 'http://192.168.56.1:5000',
 })
@@ -11,8 +12,10 @@ const api = axios.create({
 export default function LoginScreen() {
   const navigation = useNavigation()
   const [email, setEmail] = useState('')
+  const { logIn } = useContext(AuthContext)
   const [password, setPassword] = useState('')
   const [emailError, setEmailError] = useState('')
+
   // Kiểm tra email hợp lệ
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -38,10 +41,12 @@ export default function LoginScreen() {
       const response = await api.post('/signin', { email, password })
       if (response.status === 200) {
         const { token, user } = response.data
+        await AsyncStorage.setItem('token', token)
+        logIn(user)
         Alert.alert('Thành công', 'Chúc mừng bạn đăng nhập thành công!')
         console.log(user)
-        setEmail(""),
-        setPassword("")
+        setEmail('')
+        setPassword('')
         navigation.navigate('MainBottom', { user, token })
       }
     } catch (error) {
@@ -59,12 +64,7 @@ export default function LoginScreen() {
           <Text style={styles.heading_title}>Đăng nhập ngay</Text>
           <Text style={styles.desc}>Món ngon mỗi ngày</Text>
         </View>
-        <Input
-          label='Email'
-          iconname='email'
-          value={email}
-          onChangeText={handleEmailChange}
-        />
+        <Input label='Email' iconname='email' value={email} onChangeText={handleEmailChange} />
         <Input
           label='Mật khẩu'
           iconname='key'

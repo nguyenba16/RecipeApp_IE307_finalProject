@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useEffect, useContext, useRef } from 'react'
 import {
   View,
   Text,
@@ -11,48 +11,13 @@ import {
 } from 'react-native'
 import color from '../../../color'
 import OutStandingDishCard from './components/OutStandingDishCard'
+import axios from 'axios'
+import { AuthContext } from '../../components/AuthContext'
+import TraditionalDishCard from './components/TraditionalDishCard'
 
-const outstandingDish = [
-  {
-    id: 1,
-    dishName: 'Gà kho xả',
-    time: 20,
-    img: require('../../../assets/images/scr_home/noibat_1.png'),
-  },
-  {
-    id: 2,
-    dishName: 'Canh mồng tơi',
-    time: 100,
-    img: require('../../../assets/images/scr_home/noibat_2.png'),
-  },
-  {
-    id: 3,
-    dishName: 'Canh ruột bầu nấu với râu tôm',
-    time: 10,
-    img: require('../../../assets/images/scr_home/noibat_3.png'),
-  },
-]
-
-const traditionalDish = [
-  {
-    id: 1,
-    name: 'Phở bò Việt Nam',
-    img: require('../../../assets/images/scr_home/phobo.png'),
-    time: 30,
-  },
-  {
-    id: 2,
-    name: 'Bún chả Hà Nội',
-    img: require('../../../assets/images/scr_home/phobo.png'),
-    time: 25,
-  },
-  {
-    id: 3,
-    name: 'Cơm tấm Sài Gòn',
-    img: require('../../../assets/images/scr_home/phobo.png'),
-    time: 40,
-  },
-]
+const api = axios.create({
+  baseURL: 'http://192.168.56.1:5000',
+})
 
 const categroryDish = [
   {
@@ -82,12 +47,36 @@ const categroryDish = [
 ]
 
 export default function HomeScreen() {
-  const name_user = 'Nguyễn Công Bá'
+  const { user } = useContext(AuthContext)
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [outstandingDishes, setOutstandingDishes] = useState([])
+  const [traditionalDish, setTraditionalDish] = useState([])
+  const fetchOutstandingDishes = async () => {
+    try {
+      const response = await api.get('/outstanding-dishes')
+      setOutstandingDishes(response.data)
+    } catch (error) {
+      console.error('Error fetching outstanding dishes:', error)
+    }
+  }
+
+  const fetchTraditinalDishes = async () => {
+    try {
+      const response = await api.get('/traditional-dishes')
+      setTraditionalDish(response.data)
+    } catch (error) {
+      console.error('Error fetching outstanding dishes:', error)
+    }
+  }
+  useEffect(() => {
+    fetchOutstandingDishes()
+    fetchTraditinalDishes()
+  }, [])
+
   const flatListRef = useRef(null)
 
   const handleScroll = (event) => {
-    const index = Math.round(event.nativeEvent.contentOffset.x / 250) // Adjust width if needed
+    const index = Math.round(event.nativeEvent.contentOffset.x / 500)
     setCurrentIndex(index)
   }
 
@@ -100,7 +89,7 @@ export default function HomeScreen() {
             style={styles.imageBackground}
           >
             <Text style={styles.greeting}>Xin chào!</Text>
-            <Text style={styles.name_user}>{name_user}</Text>
+            <Text style={styles.name_user}>{user.userName}</Text>
           </ImageBackground>
           <View style={styles.slogan_box}>
             <Text style={styles.slogan}>Ăn ngon sống khỏe, tươi trẻ mỗi ngày!</Text>
@@ -111,7 +100,7 @@ export default function HomeScreen() {
           <View style={styles.outstanding_box}>
             <Text style={styles.title}>Món nổi bật</Text>
             <FlatList
-              data={outstandingDish}
+              data={outstandingDishes}
               renderItem={({ item }) => <OutStandingDishCard dish={item} />}
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -121,6 +110,17 @@ export default function HomeScreen() {
           {/* Món truyền thống */}
           <View style={styles.traditional_dish}>
             <Text style={styles.title}>Món ăn truyền thống</Text>
+            {/* lỗi */}
+            <FlatList
+              data={traditionalDish}
+              renderItem={({ item }) => <TraditionalDishCard item={item} />}
+              keyExtractor={(item, index) => (item.id ? item.id.toString() : index.toString())}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              onScroll={handleScroll}
+              ref={flatListRef}
+            />
             {/* Pagination Dots */}
             <View style={styles.pagination}>
               {traditionalDish.map((_, index) => (
@@ -207,7 +207,8 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   card_traditional: {
-    width: 390,
+    padding: 5,
+    width: 370,
     borderRadius: 20,
     marginHorizontal: 10,
     backgroundColor: '#fff',
@@ -220,7 +221,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
   },
   dishName_traditional: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     padding: 10,
   },
@@ -233,15 +234,16 @@ const styles = StyleSheet.create({
   },
   time_traditional: {
     fontSize: 14,
-    color: '#555',
+    color: '#333',
   },
-  likesContainer: {
+  likebox: {
     flexDirection: 'row',
+    gap: 3,
     alignItems: 'center',
+    padding: 5,
   },
-  likesText: {
+  likesNumber: {
     fontSize: 14,
-    marginLeft: 5,
     color: '#333',
   },
   pagination: {
