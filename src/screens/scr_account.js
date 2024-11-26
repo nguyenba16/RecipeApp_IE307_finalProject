@@ -5,11 +5,11 @@ import { useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const api = axios.create({
-  baseURL: 'http://192.168.56.1:5000', // Use the correct IP address for local network access
+  baseURL: 'http://192.168.56.1:5000',
 })
 
 export default function ProfileScreen() {
-  const [recipes, setRecipes] = useState([]) // State to store recipes
+  const [recipes, setRecipes] = useState([]) 
   const navigation = useNavigation()
 
   // Function to fetch data

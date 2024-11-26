@@ -5,10 +5,10 @@ import { createStackNavigator } from '@react-navigation/stack'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import HomeScreen from '../screens/scr_home/scr_home'
 import SearchScreen from '../screens/scr_search'
-import GroceriesScreen from '../screens/scr_groceries'
-import AccountScreen from '../screens/scr_account'
+import GroceriesScreen from '../screens/scr_groceries/scr_groceries'
+import AccountScreen from '../screens/scr_account/scr_account'
 import DishDetail from '../screens/scr_dishDetails/scr_dishDetails'
-
+import { useNavigation } from '@react-navigation/native'
 const Tab = createBottomTabNavigator()
 const Stack = createStackNavigator()
 
@@ -42,7 +42,11 @@ function ProfileStack() {
   )
 }
 
+
 export default function MainBottom() {
+
+  const navigation = useNavigation();
+
   return (
     <Fragment>
       <Tab.Navigator
@@ -99,7 +103,7 @@ export default function MainBottom() {
       </Tab.Navigator>
 
       <View style={styles.addButtonContainer}>
-        <TouchableOpacity style={styles.addButton} onPress={() => alert('Add button pressed!')}>
+        <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate("NewRecipe")}>
           <Ionicons name='add' size={50} color='white' />
         </TouchableOpacity>
       </View>

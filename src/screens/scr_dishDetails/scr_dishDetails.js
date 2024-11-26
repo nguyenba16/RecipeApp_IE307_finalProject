@@ -27,7 +27,7 @@ export default function DishDetail({ route }) {
   const { dishID } = route.params
   const { user } = useContext(AuthContext)
   const navigation = useNavigation()
-  const [isLike, setIsLike] = useState(false)
+  const [isLike, setIsLike] = useState()
   const [isSave, setIsSave] = useState(false)
   const [countLike, setCountLike] = useState(16)
   const [countSave, setCountSave] = useState(384)
@@ -54,8 +54,32 @@ export default function DishDetail({ route }) {
     }
   }
 
+  
+  const userId = user.id
+  const fetchLike = async () => {
+    try {
+      const response = await api.post(`/like/${dishID}`, { userId })
+      setIsLike(response.data.success)
+      fetchDetailDish()
+    } catch (error) {
+      console.error('Lỗi khi xử lý like', error)
+    }
+  }
+
+  const fetchSave = async () => {
+    try {
+      const response = await api.post(`/save/${dishID}`, { userId })
+      setIsSave(response.data.success)
+      fetchDetailDish()
+    } catch (error) {
+      console.error('Lỗi khi xử lý save', error)
+    }
+  }
+
   useEffect(() => {
     fetchDetailDish()
+    fetchLike()
+    fetchSave()
   }, [])
 
   if (isLoading) {
@@ -68,19 +92,11 @@ export default function DishDetail({ route }) {
   }
 
   const handleLike = () => {
-    if (isLike) {
-      setIsLike(false), setCountLike(countLike - 1)
-    } else {
-      setIsLike(true), setCountLike(countLike + 1)
-    }
+    fetchLike()
   }
 
   const handleSave = () => {
-    if (isSave) {
-      setIsSave(false), setCountSave(countSave - 1)
-    } else {
-      setIsSave(true), setCountSave(countSave + 1)
-    }
+    fetchSave()
   }
 
   const handleSendComment = async () => {
@@ -120,7 +136,7 @@ export default function DishDetail({ route }) {
                     <Icon name='bookmark' size={30}></Icon>
                   )}
                 </TouchableOpacity>
-                <Text style={styles.count_react}>{detailDish.saveNumber}</Text>
+                <Text style={styles.count_react}>{detailDish.saveUsers.length}</Text>
               </View>
               <View style={styles.react_icon_count}>
                 <TouchableOpacity onPress={handleLike} style={styles.react}>
@@ -130,7 +146,7 @@ export default function DishDetail({ route }) {
                     <Icon name='heart' size={28}></Icon>
                   )}
                 </TouchableOpacity>
-                <Text style={styles.count_react}>{detailDish.likeNumber}</Text>
+                <Text style={styles.count_react}>{detailDish.likeUsers.length}</Text>
               </View>
             </View>
           </View>
