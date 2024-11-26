@@ -128,42 +128,42 @@ app.post('/signup', async (req, res) => {
   }
 })
 
-// post recipe/ add a recipe
-app.post('/add-recipe', async (req, res) => {
-  try {
-    const {
-      nameDish,
-      imgURL,
-      cookingTime,
-      servingNumber,
-      desc,
-      ingredientList,
-      cookingSteps,
-      createdBy,
-    } = req.body
-    if (!nameDish || !imgURL || !desc || !ingredientList || !cookingSteps || !createdBy) {
-      return res.status(400).json({ message: 'Điền hết các thông tin trong form' })
-    }
-    const newRecipe = new Recipe({
-      nameDish,
-      imgURL,
-      likeNumber: 0,
-      saveNumber: 0,
-      cookingTime,
-      servingNumber,
-      desc,
-      ingredientList,
-      cookingSteps,
-      createdBy: mongoose.Types.ObjectId(createdBy),
-    })
-    const savedRecipe = await newRecipe.save()
-    console.log('Đã thêm thành công công thức này: ', savedRecipe)
-    res.status(201).json({ message: 'Đã thêm thành công công thức mới!', recipe: savedRecipe })
-  } catch (error) {
-    console.error('Error adding recipe:', error)
-    res.status(500).json({ message: 'Internal server error' })
-  }
-})
+// post recipe/ add a recipe -> xem lại vì có bổ sung thêm 1 số trường trong DB như categroryType
+// app.post('/add-recipe', async (req, res) => {
+//   try {
+//     const {
+//       nameDish,
+//       imgURL,
+//       cookingTime,
+//       servingNumber,
+//       desc,
+//       ingredientList,
+//       cookingSteps,
+//       createdBy,
+//     } = req.body
+//     if (!nameDish || !imgURL || !desc || !ingredientList || !cookingSteps || !createdBy) {
+//       return res.status(400).json({ message: 'Điền hết các thông tin trong form' })
+//     }
+//     const newRecipe = new Recipe({
+//       nameDish,
+//       imgURL,
+//       likeNumber: 0,
+//       saveNumber: 0,
+//       cookingTime,
+//       servingNumber,
+//       desc,
+//       ingredientList,
+//       cookingSteps,
+//       createdBy: mongoose.Types.ObjectId(createdBy),
+//     })
+//     const savedRecipe = await newRecipe.save()
+//     console.log('Đã thêm thành công công thức này: ', savedRecipe)
+//     res.status(201).json({ message: 'Đã thêm thành công công thức mới!', recipe: savedRecipe })
+//   } catch (error) {
+//     console.error('Error adding recipe:', error)
+//     res.status(500).json({ message: 'Internal server error' })
+//   }
+// })
 
 // Xóa recipe bằng id
 app.delete('/my-recipes/:id', authMiddleware, async (req, res) => {
@@ -211,8 +211,19 @@ app.get('/my-recipes', authMiddleware, async (req, res) => {
 // api lấy các món ăn nổi bật -> điều kiện là nhiều tim nhất lấy 5 món
 app.get('/outstanding-dishes', async (req, res) => {
   try {
-    const outstandingDishes = await Recipe.find().sort({ likeNumber: -1 }).limit(5)
-    console.log(outstandingDishes)
+    const outstandingDishes = await Recipe.aggregate([
+      {
+        $addFields: {
+          likeCount: { $size: '$likeUsers' },
+        },
+      },
+      {
+        $sort: { likeCount: -1 },
+      },
+      {
+        $limit: 5,
+      },
+    ])
     if (!outstandingDishes.length) {
       return res.status(404).json({ message: 'No outstanding dishes found' })
     }
@@ -237,7 +248,7 @@ app.get('/traditional-dishes', async (req, res) => {
     ]
     const dishPromises = dishKeywords.map(async (keyword) => {
       const dish = await Recipe.findOne({ nameDish: { $regex: keyword, $options: 'i' } })
-        .sort({ likeNumber: -1 })
+        // .sort({ likeNumber: -1 })
         .limit(1)
       return dish
     })
@@ -336,7 +347,60 @@ app.get('/detailpage/:id', async (req, res) => {
   }
 })
 
+// Api xử lý like
+app.post('/like/:recipeId', async (req, res) => {
+  const { userId } = req.body
+  const { recipeId } = req.params
+  try {
+    const recipe = await Recipe.findById(recipeId)
+    const hasLiked = recipe.likeUsers.includes(userId)
+    if (hasLiked) {
+      await Recipe.findByIdAndUpdate(recipeId, { $pull: { likeUsers: userId } }, { new: true })
+      return res.status(200).json({ success: false, message: 'Đã bỏ like' })
+    } else {
+      await Recipe.findByIdAndUpdate(recipeId, { $push: { likeUsers: userId } }, { new: true })
+      return res.status(200).json({ success: true, message: 'Đã like' })
+    }
+  } catch (error) {
+    console.error('Lỗi server:', error)
+    return res
+      .status(500)
+      .json({ success: false, message: 'Có lỗi xảy ra khi xử lý yêu cầu', error: error.message })
+  }
+})
+
+// Api xử lý save
+app.post('/save/:recipeId', async (req, res) => {
+  const { userId } = req.body
+  const { recipeId } = req.params
+  try {
+    const recipe = await Recipe.findById(recipeId)
+    const hasSaved = recipe.saveUsers.includes(userId)
+    if (hasSaved) {
+      await Recipe.findByIdAndUpdate(recipeId, { $pull: { saveUsers: userId } }, { new: true })
+      return res.status(200).json({ success: false, message: 'Đã bỏ save' })
+    } else {
+      await Recipe.findByIdAndUpdate(recipeId, { $push: { saveUsers: userId } }, { new: true })
+      return res.status(200).json({ success: true, message: 'Đã save' })
+    }
+  } catch (error) {
+    console.error('Lỗi server:', error)
+    return res
+      .status(500)
+      .json({ success: false, message: 'Có lỗi xảy ra khi xử lý yêu cầu', error: error.message })
+  }
+})
+
+// Api categroies
+// app.post('/categrories', async (req, res) => {
+//   const categroryType = req.body
+//   try {
+//     const recipe =
+//   } catch (error) {
+//     console.error("Error: ", error)
+//   }
+// })
 const PORT = 5000
 app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`)
+  console.log(`Server running at http://192.168.1.13:${PORT}`)
 })

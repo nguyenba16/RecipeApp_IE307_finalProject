@@ -6,7 +6,6 @@ import {
   ScrollView,
   Image,
   ImageBackground,
-  FlatList,
   TouchableOpacity,
   TextInput,
   ActivityIndicator,
@@ -27,30 +26,65 @@ export default function DishDetail({ route }) {
   const { dishID } = route.params
   const { user } = useContext(AuthContext)
   const navigation = useNavigation()
+
   const [isLike, setIsLike] = useState(false)
   const [isSave, setIsSave] = useState(false)
-  const [countLike, setCountLike] = useState(16)
-  const [countSave, setCountSave] = useState(384)
-
   const [isExpanded, setIsExpanded] = useState(false)
-
   const [comment, setComment] = useState('')
-
   const [ingredients, setIngredients] = useState([])
   const [commentList, setCommentList] = useState([])
-  const [detailDish, setDetailDish] = useState([])
+  const [detailDish, setDetailDish] = useState({})
   const [isLoading, setIsLoading] = useState(true)
 
-  const fetchDetailDish = async (id = dishID) => {
+  const userId = user.id
+
+  const fetchDetailDish = async () => {
     try {
-      const response = await api.get(`/detailpage/${id}`)
-      setDetailDish(response.data.recipe)
-      setCommentList(response.data.comments)
-      setIngredients(response.data.ingredients)
+      const response = await api.get(`/detailpage/${dishID}`)
+      const { recipe, comments, ingredients } = response.data
+      setDetailDish(recipe)
+      setCommentList(comments)
+      setIngredients(ingredients)
+      setIsLike(recipe.likeUsers.includes(userId))
+      setIsSave(recipe.saveUsers.includes(userId))
     } catch (error) {
       console.error('Error fetching dish:', error)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleLike = async () => {
+    try {
+      const response = await api.post(`/like/${dishID}`, { userId })
+      setIsLike(response.data.success)
+    } catch (error) {
+      console.error('Lỗi khi xử lý like', error)
+    }
+    fetchDetailDish()
+  }
+
+  const handleSave = async () => {
+    try {
+      const response = await api.post(`/save/${dishID}`, { userId })
+      setIsSave(response.data.success)
+    } catch (error) {
+      console.error('Lỗi khi xử lý save', error)
+    }
+    fetchDetailDish()
+  }
+
+  const handleSendComment = async () => {
+    try {
+      await api.post('/add-comment', {
+        comment,
+        recipeID: detailDish._id,
+        idUser: userId,
+      })
+      setComment('')
+      fetchDetailDish()
+    } catch (error) {
+      console.error('Error sending comment:', error)
     }
   }
 
@@ -67,38 +101,6 @@ export default function DishDetail({ route }) {
     )
   }
 
-  const handleLike = () => {
-    if (isLike) {
-      setIsLike(false), setCountLike(countLike - 1)
-    } else {
-      setIsLike(true), setCountLike(countLike + 1)
-    }
-  }
-
-  const handleSave = () => {
-    if (isSave) {
-      setIsSave(false), setCountSave(countSave - 1)
-    } else {
-      setIsSave(true), setCountSave(countSave + 1)
-    }
-  }
-
-  const handleSendComment = async () => {
-    const recipeID = detailDish._id
-    const idUser = user.id
-    try {
-      await api.post('/add-comment', {
-        comment,
-        recipeID,
-        idUser,
-      })
-      setComment('')
-      fetchDetailDish()
-    } catch (err) {
-      console.error('Error: ', err)
-    }
-  }
-
   return (
     <View style={styles.container}>
       <ScrollView>
@@ -110,32 +112,22 @@ export default function DishDetail({ route }) {
         <View style={styles.mainContent}>
           <View style={styles.head}>
             <Text style={styles.dish_name}>{detailDish.nameDish}</Text>
-            {/* Các nút react */}
             <View style={styles.react_boxs}>
               <View style={styles.react_icon_count}>
                 <TouchableOpacity onPress={handleSave} style={styles.react}>
-                  {isSave == false ? (
-                    <Icon name='bookmark-o' size={30}></Icon>
-                  ) : (
-                    <Icon name='bookmark' size={30}></Icon>
-                  )}
+                  <Icon name={isSave ? 'bookmark' : 'bookmark-o'} size={30} />
                 </TouchableOpacity>
-                <Text style={styles.count_react}>{detailDish.saveNumber}</Text>
+                <Text style={styles.count_react}>{detailDish.saveUsers.length}</Text>
               </View>
               <View style={styles.react_icon_count}>
                 <TouchableOpacity onPress={handleLike} style={styles.react}>
-                  {isLike == false ? (
-                    <Icon name='heart-o' size={28}></Icon>
-                  ) : (
-                    <Icon name='heart' size={28}></Icon>
-                  )}
+                  <Icon name={isLike ? 'heart' : 'heart-o'} size={28} />
                 </TouchableOpacity>
-                <Text style={styles.count_react}>{detailDish.likeNumber}</Text>
+                <Text style={styles.count_react}>{detailDish.likeUsers.length}</Text>
               </View>
             </View>
           </View>
 
-          {/* Phần tên acc với desc */}
           <View style={styles.info}>
             <View style={styles.info_acc}>
               <Image style={styles.acc_ava} source={{ uri: detailDish.createdBy.avatar_URL }} />
@@ -149,33 +141,16 @@ export default function DishDetail({ route }) {
             </TouchableOpacity>
           </View>
 
-          {/* Phần nguyên liệu*/}
           <View style={styles.ingredient_box}>
             <Text style={styles.title}>Nguyên Liệu</Text>
             <Ingredients ingredientList={ingredients} />
-            <View style={styles.btn_box}>
-              <TouchableOpacity
-                style={styles.btnShowGroceries}
-                onPress={() => alert('Đi tới giỏ hàng của tôi')}
-              >
-                <Text style={styles.btnText}>Đi tới giỏ hàng</Text>
-              </TouchableOpacity>
-            </View>
           </View>
 
-          {/* Các bước nấu ăn */}
           <View style={styles.cookingSteps_box}>
             <Text style={styles.title_Steps}>Các bước nấu ăn</Text>
             <Steps cookingSteps={detailDish.cookingSteps} />
-            <TouchableOpacity
-              style={styles.btnShowGroceries}
-              onPress={() => alert('Bắt đầu nấu -> hiện slide')}
-            >
-              <Text style={styles.btnText}>Bắt đầu nấu ăn</Text>
-            </TouchableOpacity>
           </View>
 
-          {/* Bình luận */}
           <View style={styles.cmt_box}>
             <Text style={styles.title}>Bình luận</Text>
             <View style={styles.input_cmt_box}>
@@ -185,9 +160,9 @@ export default function DishDetail({ route }) {
                 multiline={true}
                 onChangeText={setComment}
                 value={comment}
-              ></TextInput>
+              />
               <TouchableOpacity onPress={handleSendComment}>
-                <Icon name='paper-plane' size={28} color={comment ? 'blue' : 'black'}></Icon>
+                <Icon name='paper-plane' size={28} color={comment ? 'blue' : 'black'} />
               </TouchableOpacity>
             </View>
             <CommentList data={commentList} />

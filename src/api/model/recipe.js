@@ -3,11 +3,12 @@ import mongoose from 'mongoose'
 const recipeSchema = new mongoose.Schema({
   nameDish: { type: String, required: true },
   imgURL: { type: String, require: true },
-  likeNumber: { type: Number, require: true },
-  saveNumber: { type: Number, require: true },
+  likeUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }],
+  saveUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }],
   cookingTime: { type: Number, require: true },
   servingNumber: { type: Number, require: true },
   desc: { type: String, required: true },
+  categroryType: { type: String, required: true },
   ingredientList: [
     {
       ingredientID: { type: mongoose.Schema.Types.ObjectId, ref: 'Ingredient', required: true },
