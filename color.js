@@ -1,4 +1,4 @@
 export default {
-    primary: '#FF9320',
-    text_color: "#000"
-  };
+  primary: '#FF9320',
+  text_color: '#000',
+}
