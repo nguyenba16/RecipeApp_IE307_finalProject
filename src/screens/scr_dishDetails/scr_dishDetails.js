@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import {
   View,
   Text,
@@ -9,98 +9,64 @@ import {
   FlatList,
   TouchableOpacity,
   TextInput,
+  ActivityIndicator,
 } from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import Ingredients from './components/ingredients'
 import Steps from './components/steps'
 import CommentList from './components/commentList'
+import axios from 'axios'
+import { useNavigation } from '@react-navigation/native'
+import { AuthContext } from '../../components/AuthContext'
 
-const dishDetail = {
-  dish_img: require('../../../assets/images/dishDetail/img_head.png'),
-  dish_name: 'Canh bí đỏ giò heo',
-  dish_desc:
-    'Canh bí giò heo là món ăn truyền thống đậm chất Việt, với sự kết hợp hoàn hảo giữa vị ngọt thanh của bí xanh và vị béo mềm của giò heo. Bí xanh được nấu chín mềm, giò heo thấm đậm gia vị, tạo nên một món canh bổ dưỡng, thanh mát, thích hợp cho những bữa cơm gia đình, đặc biệt trong những ngày hè nóng bức. Món ăn không chỉ ngon mà còn cung cấp nhiều dưỡng chất tốt cho sức khỏe',
-}
+const api = axios.create({
+  baseURL: 'http://192.168.56.1:5000',
+})
 
-const dish_ingredient = [
-  {
-    id: 1,
-    ingredient_name: 'Giò heo',
-    mass: 0.5,
-  },
-  {
-    id: 2,
-    ingredient_name: 'Hành',
-    mass: 0.5,
-  },
-  {
-    id: 3,
-    ingredient_name: 'Tỏi',
-    mass: 0.5,
-  },
-  {
-    id: 4,
-    ingredient_name: 'Ớt cay',
-    mass: 0.5,
-  },
-  {
-    id: 5,
-    ingredient_name: 'Giò heo',
-    mass: 0.5,
-  },
-  {
-    id: 6,
-    ingredient_name: 'Giò heo',
-    mass: 0.5,
-  },
-  {
-    id: 7,
-    ingredient_name: 'Giò heo',
-    mass: 0.5,
-  },
-  {
-    id: 8,
-    ingredient_name: 'Giò heo',
-    mass: 0.5,
-  },
-]
-
-const cookingSteps = [
-  {
-    id: '1',
-    img_step: require('../../../assets/images/dishDetail/img_step1.png'),
-    desc_step:
-      'Cho giò heo, xương gà đã qua một lần nước vào nồi, đổ nước lọc vào cho ngập là được, cho hành tây đã bóc vỏ và cắt làm 4 vào, cho nước vào nồi và cho cho cho cho cho cho cho cho cho cho cho cho cho cho cho cho',
-  },
-  {
-    id: '2',
-    img_step: require('../../../assets/images/dishDetail/step3.png'),
-    desc_step:
-      'Cho giò heo, xương gà đã qua một lần nước vào nồi, đổ nước lọc vào cho ngập là được, cho hành tây đã bóc vỏ và cắt làm 4 vào, cho nước vào nồi và cho cho cho cho cho cho cho cho cho cho cho cho cho cho cho cho',
-  },
-  {
-    id: '3',
-    img_step: require('../../../assets/images/dishDetail/img_step1.png'),
-    desc_step:
-      'Cho giò heo, xương gà đã qua một lần nước vào nồi, đổ nước lọc vào cho ngập là được, cho hành tây đã bóc vỏ và cắt làm 4 vào, cho nước vào nồi và cho cho cho cho cho cho cho cho cho cho cho cho cho cho cho cho',
-  },
-  {
-    id: '4',
-    img_step: require('../../../assets/images/dishDetail/img_step1.png'),
-    desc_step:
-      'Cho giò heo, xương gà đã qua một lần nước vào nồi, đổ nước lọc vào cho ngập là được, cho hành tây đã bóc vỏ và cắt làm 4 vào, cho nước vào nồi và cho cho cho cho cho cho cho cho cho cho cho cho cho cho cho cho',
-  },
-]
-
-export default function DishDetail() {
+export default function DishDetail({ route }) {
+  const { dishID } = route.params
+  const { user } = useContext(AuthContext)
+  const navigation = useNavigation()
   const [isLike, setIsLike] = useState(false)
   const [isSave, setIsSave] = useState(false)
   const [countLike, setCountLike] = useState(16)
   const [countSave, setCountSave] = useState(384)
+
   const [isExpanded, setIsExpanded] = useState(false)
-  const [isChange, setIsChange] = useState(false)
+
   const [comment, setComment] = useState('')
+
+  const [ingredients, setIngredients] = useState([])
   const [commentList, setCommentList] = useState([])
+  const [detailDish, setDetailDish] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  const fetchDetailDish = async (id = dishID) => {
+    try {
+      const response = await api.get(`/detailpage/${id}`)
+      setDetailDish(response.data.recipe)
+      setCommentList(response.data.comments)
+      setIngredients(response.data.ingredients)
+    } catch (error) {
+      console.error('Error fetching dish:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchDetailDish()
+  }, [])
+
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size='large' color='#FF9320' />
+        <Text>Đang tải dữ liệu...</Text>
+      </View>
+    )
+  }
+
   const handleLike = () => {
     if (isLike) {
       setIsLike(false), setCountLike(countLike - 1)
@@ -117,21 +83,33 @@ export default function DishDetail() {
     }
   }
 
-  const handleSendComment = () => {
-    setCommentList([...commentList, comment])
-    setComment('')
+  const handleSendComment = async () => {
+    const recipeID = detailDish._id
+    const idUser = user.id
+    try {
+      await api.post('/add-comment', {
+        comment,
+        recipeID,
+        idUser,
+      })
+      setComment('')
+      fetchDetailDish()
+    } catch (err) {
+      console.error('Error: ', err)
+    }
   }
 
   return (
     <View style={styles.container}>
       <ScrollView>
-          <ImageBackground source={dishDetail.dish_img} style={styles.dish_img}>
-            <TouchableOpacity style={styles.btn_back} onPress={() => alert('quay lại trang trước')}>
-              <Icon name='angle-left' size={30} color={'#000'} />
-            </TouchableOpacity>
-          </ImageBackground>
+        <ImageBackground source={{ uri: detailDish.imgURL }} style={styles.dish_img}>
+          <TouchableOpacity style={styles.btn_back} onPress={() => navigation.goBack()}>
+            <Icon name='angle-left' size={30} color={'#000'} />
+          </TouchableOpacity>
+        </ImageBackground>
+        <View style={styles.mainContent}>
           <View style={styles.head}>
-            <Text style={styles.dish_name}>{dishDetail.dish_name}</Text>
+            <Text style={styles.dish_name}>{detailDish.nameDish}</Text>
             {/* Các nút react */}
             <View style={styles.react_boxs}>
               <View style={styles.react_icon_count}>
@@ -142,7 +120,7 @@ export default function DishDetail() {
                     <Icon name='bookmark' size={30}></Icon>
                   )}
                 </TouchableOpacity>
-                <Text style={styles.count_react}>{countSave}</Text>
+                <Text style={styles.count_react}>{detailDish.saveNumber}</Text>
               </View>
               <View style={styles.react_icon_count}>
                 <TouchableOpacity onPress={handleLike} style={styles.react}>
@@ -152,7 +130,7 @@ export default function DishDetail() {
                     <Icon name='heart' size={28}></Icon>
                   )}
                 </TouchableOpacity>
-                <Text style={styles.count_react}>{countLike}</Text>
+                <Text style={styles.count_react}>{detailDish.likeNumber}</Text>
               </View>
             </View>
           </View>
@@ -160,25 +138,21 @@ export default function DishDetail() {
           {/* Phần tên acc với desc */}
           <View style={styles.info}>
             <View style={styles.info_acc}>
-              {/* Ảnh đại diện */}
-              <Image
-                style={styles.acc_ava}
-                source={require('../../../assets/icons/logo.png')}
-              ></Image>
-              <Text style={styles.acc_name}>Nguyễn Công Bá</Text>
+              <Image style={styles.acc_ava} source={{ uri: detailDish.createdBy.avatar_URL }} />
+              <Text style={styles.acc_name}>{detailDish.createdBy.userName}</Text>
             </View>
             <Text style={styles.desc} numberOfLines={isExpanded ? null : 4}>
-              {dishDetail.dish_desc}
+              {detailDish.desc}
             </Text>
             <TouchableOpacity onPress={() => setIsExpanded(!isExpanded)}>
               <Text style={styles.seeMoreText}>{isExpanded ? 'Thu gọn' : 'Xem thêm'}</Text>
             </TouchableOpacity>
           </View>
 
-          {/* Phần nguyên liệu */}
+          {/* Phần nguyên liệu*/}
           <View style={styles.ingredient_box}>
             <Text style={styles.title}>Nguyên Liệu</Text>
-            <Ingredients dish_ingredient={dish_ingredient} />
+            <Ingredients ingredientList={ingredients} />
             <View style={styles.btn_box}>
               <TouchableOpacity
                 style={styles.btnShowGroceries}
@@ -192,7 +166,7 @@ export default function DishDetail() {
           {/* Các bước nấu ăn */}
           <View style={styles.cookingSteps_box}>
             <Text style={styles.title_Steps}>Các bước nấu ăn</Text>
-            <Steps cookingSteps={cookingSteps} />
+            <Steps cookingSteps={detailDish.cookingSteps} />
             <TouchableOpacity
               style={styles.btnShowGroceries}
               onPress={() => alert('Bắt đầu nấu -> hiện slide')}
@@ -218,6 +192,7 @@ export default function DishDetail() {
             </View>
             <CommentList data={commentList} />
           </View>
+        </View>
       </ScrollView>
     </View>
   )
@@ -227,6 +202,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  mainContent: {
+    flexDirection: 'absolute',
+  },
   head: {
     justifyContent: 'center',
     paddingBottom: 30,
@@ -234,7 +212,7 @@ const styles = StyleSheet.create({
     borderColor: '#D9D9D9',
   },
   dish_img: {
-    width: 412,
+    width: '100%',
     height: 418,
   },
   btn_back: {
@@ -249,10 +227,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   dish_name: {
+    padding: 10,
     fontSize: 30,
     fontWeight: 'bold',
     textTransform: 'uppercase',
-    marginTop: 32,
+    marginTop: 20,
     textAlign: 'center',
   },
   react_boxs: {
@@ -293,8 +272,8 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   acc_ava: {
-    width: 70,
-    height: 70,
+    width: 50,
+    height: 50,
     borderRadius: 1000,
   },
   acc_name: {
