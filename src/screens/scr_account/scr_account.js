@@ -24,7 +24,7 @@ export default function ProfileScreen() {
             source={require('../../../assets/icons/logo.png')}
           />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.backgroung_setting} onPress={() => alert('Setting')}>
+        <TouchableOpacity style={styles.backgroung_setting} onPress={() => navigation.navigate('Setting')}>
           <Image resizeMode='cover' source={require('../../../assets/icons/setting.png')} />
         </TouchableOpacity>
       </View>
@@ -44,7 +44,7 @@ export default function ProfileScreen() {
         <Tab.Screen
           name='Công thức chia sẻ'
           component={ListSharedRecipe}
-          options={{ tabBarLabel: 'Công thức chia sẻ' }}
+          options={{ tabBarLabel: 'Công thức yêu thích' }}
         />
       </Tab.Navigator>
     </View>

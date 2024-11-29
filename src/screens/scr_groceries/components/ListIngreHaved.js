@@ -57,8 +57,10 @@ export default function ListIngreHaved() {
   return (
     <View style={styles.container}>
       <ScrollView>
-        {ListIngre.map((recipe, index) => (
-          <ItemHaved key={index} ingredient={recipe} />
+        {ListIngre.map((recipe, index) => ( 
+          <View key={index}> 
+            <ItemHaved  ingredient={recipe} />
+          </View> 
         ))}
       </ScrollView>
     </View>
