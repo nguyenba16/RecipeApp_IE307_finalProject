@@ -2,7 +2,7 @@ import React from 'react'
 import { View, StyleSheet, Text, TouchableOpacity, Image } from 'react-native'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 
-export default function ItemIngre({ ingredient, quality }) {
+export default function ItemIngre({ ingredient, quality, remove }) {
   return (
     <View style={styles.container}> 
             <View style={styles.ingredient_info}>
@@ -17,7 +17,7 @@ export default function ItemIngre({ ingredient, quality }) {
               </View>
               <TouchableOpacity
                 style={styles.addButton}
-                onPress={() => alert('Add button pressed!')}
+                onPress={remove}
               >
                 <Ionicons name='close-circle-outline' size={20} color='#FF9320' />
               </TouchableOpacity>

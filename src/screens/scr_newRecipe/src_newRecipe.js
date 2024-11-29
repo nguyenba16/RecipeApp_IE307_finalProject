@@ -132,6 +132,11 @@ export default function NewRecipe() {
       setStateIngre(false)
     }    
   }
+  //Xóa nguyên liệu ra khỏi danh sách
+  const removeIngre = (ingre) => {
+    const newArray = ListAddIngre.filter((element) => element !== ingre)
+    setListAddIngre(newArray);
+  }
   //Kiểm soát giá trị thêm vào mảng nguyên liệu
   const [stateIngre, setStateIngre] = useState(false)
   useEffect(() => {
@@ -140,8 +145,6 @@ export default function NewRecipe() {
     }
   }, [{ingredient}, {quality}]);
   
-  //Nhận giá trị thứ tự bước
-  const [numberstep, setNumberstep] = useState(1)
   //Nhận giá trị của tiêu đề từng bước
   const [titleMethod, setTitleMethod] = useState('')
   //Nhận đường dẫn của ảnh từng bước thực hiện
@@ -167,12 +170,11 @@ export default function NewRecipe() {
   //Danh sách các bước thực hiện
   const [method, setMethod] = useState([])
   const addMethodStep = () => { 
-    if(titleMethod!=null && detailMethod!=numberstep){
-      const newStep = { numberstep: numberstep, title: titleMethod, image: imgMethod, detail: detailMethod, }; 
+    if(titleMethod!='' && detailMethod!=''){
+      const newStep = { title: titleMethod, image: imgMethod, detail: detailMethod, }; 
       setMethod([...method, newStep]);
     }
     // Đặt lại các giá trị sau khi thêm 
-    setNumberstep(numberstep + 1); 
     setTitleMethod(''); 
     setImgMethod(null); 
     setDetailMethod(''); 
@@ -185,6 +187,9 @@ export default function NewRecipe() {
       setStaeMethod(true)
     }
   }, [{titleMethod}, {imgMethod}, {detailMethod}])
+
+
+
   return (
     <SafeAreaView style={styles.container}>
       {/* header */}
@@ -307,7 +312,7 @@ export default function NewRecipe() {
               if (ingre.id === item.key) {
                 return (
                   <View key={item.key}>
-                    <ItemIngre ingredient={item} quality={ingre.quality} />
+                    <ItemIngre ingredient={item} quality={ingre.quality} remove={()=>removeIngre(ingre)} />
                   </View>
                 )
               }
@@ -349,15 +354,10 @@ export default function NewRecipe() {
 
         <Text style={styles.title_ingredient}>Các bước thực hiện</Text>
        
-        {method.map((item, index) => (
-          <View key={index}>
-            <ItemStep step={item}/>
-          </View>
-        ))}
-        <View style={styles.methodcook}> 
-          
+        <ItemStep method={method} setmethod={setMethod}/>
+        <View style={styles.methodcook}>           
           {/* Thứ tự bước thực hiện */} 
-          <Text style={styles.method_number}>Bước {numberstep} :</Text> 
+          <Text style={styles.method_number}>Bước {method.length+1} :</Text> 
           <View style={styles.title_method}>
              {/* Nhập title bước thực hiện */} 
              <TextInput style={styles.text_title_method} 
@@ -587,7 +587,6 @@ const styles = StyleSheet.create({
   },
   methodcook: {
     width: '90%',
-    marginTop: 10,
     marginHorizontal: 20,
   },
   title_method: {
@@ -604,6 +603,7 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     textAlignVertical: 'center',
     margin: 3,
+    marginTop: 20,
     textAlign: "left",
     fontWeight: "500"
   },

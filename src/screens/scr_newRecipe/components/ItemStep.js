@@ -1,20 +1,35 @@
-import React from 'react'
-import { View, StyleSheet, Text, Image } from 'react-native'
+import React, { useState } from 'react'
+import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 
-export default function ItemStep({step}) {
+export default function ItemStep({method, setmethod}) {
+  const removeStep = (step) =>{
+    const newArray = method.filter((element) => element !== step)
+    setmethod(newArray);
+  }
   return (
-    <View style={styles.stepCard}>
-      <Text style={styles.method_number}>Bước {step.numberstep}: {step.title}</Text> 
-      <Text
-          style={styles.text_method}
-        >{step.detail}</Text>
-      <View style={styles.title_method}>
-        <Image source={{uri:step.image}} style={styles.upload_method}/>            
-        
-      </View>
+    <View>
+      {method.map((step, index) => {
+        return (
+          <View key={index} style={styles.stepCard}>
+            <View style={{flexDirection: "row"}}>
+              <Text style={styles.method_number}>Bước {index+1}: {step.title}</Text> 
+              <TouchableOpacity onPress={()=>removeStep(step)}
+               style={{ justifyContent: "center",marginLeft:5, alignItems: "center"}}>
+                <Ionicons  name='trash-outline' size={25} color='#FF9320' />                
+              </TouchableOpacity>              
+            </View>
             
+            <Text
+                style={styles.text_method}
+              >{step.detail}</Text>
+            <View style={styles.title_method}>
+              <Image source={{uri:step.image}} style={styles.upload_method}/>   
+            </View>
+          </View>
+        )
+      })}
     </View>
-
   )
 }
 
@@ -23,9 +38,8 @@ const styles = StyleSheet.create({
         width: "90%",
         justifyContent: "center",
         alignSelf: "center",
-        marginBottom: 25,
-        paddingBottom: 50,
-        paddingTop: 20
+        marginBottom: 15,
+        marginTop: 10
     },
     methodcook: {
       width: '90%',
@@ -36,18 +50,19 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       width: '100%',
       justifyContent: 'space-between',
-      height: 40,
       fontSize: 15,
       marginTop: 5,
     },
     method_number: {
       fontSize: 18,
       textAlign: 'center',
-      borderRadius: 100,
       textAlignVertical: 'center',
-      margin: 3,
       textAlign: "left",
-      fontWeight: "500"
+      fontWeight: "500",
+      width: "95%",
+      backgroundColor: "#FFEDD7",
+      borderRadius: 5,
+      padding: 5
     },
     text_title_method: {
       width: '100%',
