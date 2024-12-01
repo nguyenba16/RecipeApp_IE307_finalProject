@@ -14,7 +14,6 @@ import OutStandingDishCard from './components/OutStandingDishCard'
 import axios from 'axios'
 import { AuthContext } from '../../components/AuthContext'
 import TraditionalDishCard from './components/TraditionalDishCard'
-import { useNavigation } from '@react-navigation/native'
 import CategroryCard from './components/CategroryCard'
 
 const api = axios.create({
@@ -38,7 +37,6 @@ const categroryDish = [
 
 export default function HomeScreen() {
   const { user } = useContext(AuthContext)
-  const navigation = useNavigation()
   const [currentIndex, setCurrentIndex] = useState(0)
   const [outstandingDishes, setOutstandingDishes] = useState([])
   const [traditionalDish, setTraditionalDish] = useState([])

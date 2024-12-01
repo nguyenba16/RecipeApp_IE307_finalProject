@@ -8,6 +8,8 @@ import IntroScreen from './src/screens/scr_intro'
 import InfoUser from './src/screens/scr_account/scr_infouser'
 import { AuthProvider } from './src/components/AuthContext'
 import NewRecipe from './src/screens/src_newRecipe'
+import DishDetail from './src/screens/scr_dishDetails/scr_dishDetails'
+
 const Stack = createStackNavigator()
 
 export default function App() {
@@ -20,6 +22,7 @@ export default function App() {
           <Stack.Screen name='MainBottom' component={MainBottom} />
           <Stack.Screen name='NewRecipe' component={NewRecipe} />
           <Stack.Screen name='InfoUser' component={InfoUser} />
+          <Stack.Screen name='DishDetail' component={DishDetail} />
         </Stack.Navigator>
       </NavigationContainer>
     </AuthProvider>

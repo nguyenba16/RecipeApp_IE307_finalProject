@@ -3,12 +3,15 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 import ListSavedRecipe from './components/ListSavedRecipe'
 import ListSharedRecipe from './components/ListSharedRecipe'
 import { useNavigation } from '@react-navigation/native'
+import { AuthContext } from '../../components/AuthContext'
+import {useContext } from 'react'
 
 const Tab = createMaterialTopTabNavigator()
 
 export default function ProfileScreen() {
+  const { user } = useContext(AuthContext)
   const navigation = useNavigation()
-
+  
   return (
     <View style={styles.container}>
       <View style={styles.backgroundTitle}>
@@ -42,9 +45,9 @@ export default function ProfileScreen() {
           options={{ tabBarLabel: 'Công thức đã lưu ' }}
         />
         <Tab.Screen
-          name='Công thức chia sẻ'
+          name='Công thức của tôi'
           component={ListSharedRecipe}
-          options={{ tabBarLabel: 'Công thức chia sẻ' }}
+          options={{ tabBarLabel: 'Công thức của tôi' }}
         />
       </Tab.Navigator>
     </View>

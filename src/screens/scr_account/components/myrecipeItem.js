@@ -1,20 +1,54 @@
 import * as React from 'react'
-import { StyleSheet, View, Image, Text, TouchableOpacity } from 'react-native'
+import { StyleSheet, View, Image, Text, TouchableOpacity, Alert } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
+import Icon from 'react-native-vector-icons/FontAwesome'
+import axios from 'axios'
 
-export default function ItemRecipe({ Recipe }) {
+const api = axios.create({
+  baseURL: 'http://192.168.56.1:5000',
+})
+
+export default function MyItemRecipe({ Recipe }) {
   const navigation = useNavigation()
+
   const handleNavtoDetail = () => {
     navigation.navigate('DishDetail', { dishID: Recipe._id })
   }
+
+  const handleDeleteRecipe = async () => {
+    Alert.alert(
+      "Xác nhận xóa công thức",
+      "Bạn có chắc chắn muốn xóa công thức này ra khỏi công thức của bạn không?",
+      [
+        {
+          text: "Không",
+          style: "cancel"
+        },
+        {
+          text: "Có",
+          onPress: async () => {
+            const recipeId = Recipe._id
+            try {
+              const response = await api.delete(`/my-recipes/${recipeId}`, {
+                headers: {
+                  Authorization: `Bearer ${yourAuthToken}`,
+                },
+              })
+              if (response.status === 200) {
+                console.log('Recipe deleted:', response.data.message)
+              }
+            } catch (error) {
+              console.error('Error deleting recipe:', error.response ? error.response.data : error.message)
+            }
+          }
+        }
+      ]
+    )
+  }
+
   return (
     <TouchableOpacity style={styles.container} onPress={handleNavtoDetail}>
-      <View style={styles.img_box}>
-        <Image style={styles.image} resizeMode='cover' source={{ uri: Recipe.imgURL }} />
-        <View style={styles.time_box}>
-          <Text style={styles.head_text}>{Recipe.cookingTime} min.</Text>
-        </View>
-      </View>
+      <Image style={styles.image} resizeMode='cover' source={{ uri: Recipe.imgURL }} />
       <View style={styles.background_info_reci}>
         <Text style={styles.text_name_reci} numberOfLines={2}>
           {Recipe.nameDish}
@@ -31,12 +65,16 @@ export default function ItemRecipe({ Recipe }) {
           <Text style={styles.text_name_user}> {Recipe.createdBy.userName}</Text>
         </View>
       </View>
+      <TouchableOpacity style={styles.trash_icon} onPress={handleDeleteRecipe}>
+        <Icon name={'trash'} size={25} color={'red'} />
+      </TouchableOpacity>
     </TouchableOpacity>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
+    position: 'relative',
     margin: 10,
     marginVertical: 5,
     minHeight: 165,
@@ -62,7 +100,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   text_name_reci: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'left',
     color: 'black',
@@ -70,7 +108,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   text_nl: {
-    fontSize: 15,
+    fontSize: 13,
     flex: 1,
     textAlignVertical: 'top',
   },
@@ -89,29 +127,16 @@ const styles = StyleSheet.create({
     fontSize: 15,
     margin: 5,
   },
-  img_box: {
-    width: '40%',
-    height: '100%',
-    position: 'relative',
-  },
   image: {
     borderTopLeftRadius: 20,
     borderBottomLeftRadius: 20,
-    width: '100%',
+    width: '40%',
     height: '100%',
   },
-  time_box: {
+  trash_icon: {
     position: 'absolute',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    backgroundColor: '#FCF5D7',
-    borderRadius: 1000,
-    justifyContent: 'center',
-    alignItems: 'center',
-    top: 10,
-    left: 10,
-  },
-  head_text: {
-    fontSize: 12,
+    bottom: 7,
+    right: 12,
+    padding: 5,
   },
 })

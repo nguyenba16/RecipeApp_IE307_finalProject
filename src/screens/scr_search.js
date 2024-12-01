@@ -1,45 +1,49 @@
 import { View, StyleSheet, Image, TextInput, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import ItemRecipe from '../components/ItemRecipe'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import axios from 'axios'
 
-const ListRecipe = [
-  {
-    key: 1,
-    name: 'Bún bò - Đặc sản Huế Bún bò - Đặc sản Huế ',
-    ingredient:
-      'Bún, Thịt bò, Rau muống, Giò heo, Chả lụa, Bún, Thịt bò, Rau muống, Giò heo, Chả lụa,Bún, Thịt bò, Rau muống, Giò heo, Chả lụa, Bún, Thịt bò, Rau muống, ',
-    img: require('../../assets/bunbo.jpg'),
-    ava_user: require('../../assets/icons/logo.png'),
-    name_user: 'Cao Quốc Kiệt',
-  },
-  {
-    key: 2,
-    name: 'Bún bò - Đặc sản',
-    ingredient: 'Bún, Thịt bò, Rau muống, Giò heo, Chả lụa ',
-    img: require('../../assets/bunbo.jpg'),
-    ava_user: require('../../assets/icons/logo.png'),
-    name_user: 'Cao Quốc Kiệt',
-  },
-  {
-    key: 3,
-    name: 'Bún bò - Đặc sản Huế',
-    ingredient: 'Bún, Thịt bò, Rau muống, Giò heo, Chả lụa Bún, Thịt bò, Rau muống, Giò heo ',
-    img: require('../../assets/bunbo.jpg'),
-    ava_user: require('../../assets/icons/logo.png'),
-    name_user: 'Cao Quốc Kiệt',
-  },
-  {
-    key: 4,
-    name: 'Bún bò - Đặc sản Huế',
-    ingredient: 'Bún, Thịt bò, Rau muống, Giò heo, Chả lụa ',
-    img: require('../../assets/bunbo.jpg'),
-    ava_user: require('../../assets/icons/logo.png'),
-    name_user: 'Cao Quốc Kiệt',
-  },
-]
-export default function SearchScreen() {
-  const [textSearch, setTextSearch] = useState()
+const api = axios.create({
+  baseURL: 'http://192.168.56.1:5000',
+})
+
+export default function SearchScreen({ route }) {
+  const { cate } = route.params || ''
+  const [searchValue, setSearchValue] = useState('')
+  const [category, setCategrory] = useState(cate || '')
+  const [recipes, setRecipes] = useState([])
+
+  const fetchRecipes = async () => {
+    try {
+      const requestData = {
+        nameDish: searchValue,
+        category: category,
+      }
+      const res = await api.post('/search', requestData)
+      setRecipes(res.data.recipes || [])
+    } catch (error) {
+      console.error('Error fetching recipes: ', error)
+    }
+  }
+
+  useEffect(() => {
+    setCategrory(cate)
+  }, [cate])
+
+  useEffect(() => {
+    fetchRecipes()
+  }, [category])
+
+  useEffect(() => {
+    fetchRecipes()
+  }, [])
+
+  const handleSearch = () => {
+    setCategrory('')
+    fetchRecipes()
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.backgroundTitle}>
@@ -47,16 +51,16 @@ export default function SearchScreen() {
           <TextInput
             style={styles.text_input}
             placeholder='Tìm kiếm món ăn'
-            value={textSearch}
-            onChange={setTextSearch}
+            value={searchValue}
+            onChangeText={setSearchValue}
           />
-          <TouchableOpacity style={styles.touch_icon}>
+          <TouchableOpacity style={styles.touch_icon} onPress={handleSearch}>
             <Image style={styles.icon_search} source={require('../../assets/icons/search.png')} />
           </TouchableOpacity>
         </View>
       </View>
       <ScrollView>
-        {ListRecipe.map((recipe, index) => (
+        {recipes.map((recipe, index) => (
           <ItemRecipe key={index} Recipe={recipe} />
         ))}
       </ScrollView>
@@ -73,6 +77,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 120,
     alignItems: 'center',
+    marginBottom: 10,
   },
   search: {
     flexDirection: 'row',
@@ -85,13 +90,15 @@ const styles = StyleSheet.create({
   text_input: {
     paddingLeft: 15,
     fontSize: 18,
+    flex: 1,
   },
   touch_icon: {
     height: 30,
     width: 30,
     marginTop: 7,
-    right: 10,
-    position: 'absolute',
+    marginRight: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   icon_search: {
     height: 30,

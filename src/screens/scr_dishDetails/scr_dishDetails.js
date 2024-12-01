@@ -196,8 +196,8 @@ const styles = StyleSheet.create({
     borderRadius: 1000,
     backgroundColor: '#fff',
     direction: 'absolute',
-    top: 50,
-    left: 30,
+    top: 35,
+    left: 25,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -325,5 +325,9 @@ const styles = StyleSheet.create({
     gap: 10,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  loadingContainer: {
+    justifyContent: "center",
+    alignItems: "center"
   },
 })

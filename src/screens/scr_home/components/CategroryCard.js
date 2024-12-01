@@ -1,14 +1,16 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 
+
 const CategroryCard = ({ item }) => {
   const navigation = useNavigation()
+  const handleNavtoSearch = () => {
+    navigation.navigate('Search', { cate: item.name });
+  }
   return (
     <TouchableOpacity
       style={styles.card_cate}
-      onPress={() => {
-        navigation.navigate('Search', { categrory: item.name })
-      }}
+      onPress={handleNavtoSearch}
     >
       <Image source={item.img} style={styles.image_cate} />
       <View style={styles.overlay} />

@@ -37,14 +37,24 @@ app.get('/users', async (req, res) => {
 app.get('/users/:id', async (req, res) => {
   try {
     const userId = req.params.id
+
+    // Tìm user theo ID và populate thông tin của nguyên liệu
     const user = await User.findById(userId)
+      .populate({
+        path: 'availableIngredients.ingredientID',
+        select: 'imgIngredient IngredientName unit',
+      })
+      .populate({
+        path: 'unavailableIngredients.ingredientID',
+        select: 'imgIngredient IngredientName unit',
+      })
     if (!user) {
-      return res.status(404).send('User not found')
+      return res.status(404).json({ message: 'User not found' })
     }
-    res.json(user)
+    res.status(200).json(user)
   } catch (error) {
     console.error('Error fetching user:', error)
-    res.status(500).send(error)
+    res.status(500).json({ message: 'Server error' })
   }
 })
 
@@ -80,11 +90,9 @@ app.post('/signin', async (req, res) => {
     if (!user) {
       return res.status(401).json({ message: 'Invalid email or password' })
     }
-    // Kiểm tra mật khẩu
     if (password !== user.password) {
       return res.status(401).json({ message: 'Invalid email or password' })
     }
-    // Tạo token JWT
     const token = jwt.sign({ userId: user._id }, secretKey, { expiresIn: '1h' })
     res.status(200).json({
       message: 'Login successful',
@@ -95,6 +103,8 @@ app.post('/signin', async (req, res) => {
         phone: user.phone,
         avatar_URL: user.avatar_URL,
         userName: user.userName,
+        availableIngredients: user.availableIngredients,
+        unavailableIngredients: user.unavailableIngredients,
       },
     })
   } catch (error) {
@@ -166,6 +176,7 @@ app.post('/signup', async (req, res) => {
 // })
 
 // Xóa recipe bằng id
+
 app.delete('/my-recipes/:id', authMiddleware, async (req, res) => {
   const recipeId = req.params.id
   try {
@@ -196,14 +207,34 @@ app.get('/recipes/:id', async (req, res) => {
 })
 
 // lấy các bài viết của tôi
-app.get('/my-recipes', authMiddleware, async (req, res) => {
+app.get('/my-recipes/:userID', async (req, res) => {
   try {
-    const userId = req.user._id
-    const myRecipes = await Recipe.find({ createdBy: userId })
-    console.log(myRecipes)
+    const userId = req.params.userID
+    const myRecipes = await Recipe.find({ createdBy: userId }).populate(
+      'createdBy',
+      'userName avatar_URL',
+    )
     res.status(200).json(myRecipes)
   } catch (error) {
     console.error('Error fetching user recipes:', error)
+    res.status(500).json({ message: 'Internal Server Error', error })
+  }
+})
+
+// api lấy các bài viết đã lưu của tôi
+app.get('/saved-recipes/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params
+    const savedRecipes = await Recipe.find({ saveUsers: { $in: [userId] } }).populate(
+      'createdBy',
+      'userName avatar_URL',
+    )
+    if (!savedRecipes.length) {
+      return res.status(404).json({ message: 'No saved recipes found' })
+    }
+    res.status(200).json(savedRecipes)
+  } catch (error) {
+    console.error('Error fetching saved recipes:', error)
     res.status(500).json({ message: 'Internal Server Error', error })
   }
 })
@@ -391,15 +422,133 @@ app.post('/save/:recipeId', async (req, res) => {
   }
 })
 
-// Api categroies
-// app.post('/categrories', async (req, res) => {
-//   const categroryType = req.body
-//   try {
-//     const recipe =
-//   } catch (error) {
-//     console.error("Error: ", error)
-//   }
-// })
+// Api search
+app.post('/search', async (req, res) => {
+  const { nameDish, category } = req.body
+  try {
+    let recipes
+    if (category && !nameDish) {
+      recipes = await Recipe.find({ categroryType: { $regex: category, $options: 'i' } }).populate(
+        'createdBy',
+        'userName avatar_URL',
+      )
+    } else if (!category && nameDish) {
+      recipes = await Recipe.find({ nameDish: { $regex: nameDish, $options: 'i' } }).populate(
+        'createdBy',
+        'userName avatar_URL',
+      )
+    } else if (!category && !nameDish) {
+      recipes = await Recipe.find().populate('createdBy', 'userName avatar_URL')
+    } else if (category && nameDish) {
+      recipes = await Recipe.find({
+        nameDish: { $regex: nameDish, $options: 'i' },
+        categroryType: { $regex: category, $options: 'i' },
+      }).populate('createdBy', 'userName avatar_URL')
+    }
+    if (recipes.length === 0) {
+      return res.status(404).json({ error: 'No recipes found' })
+    }
+    res.status(200).json({ recipes })
+  } catch (error) {
+    console.error('Error in search:', error)
+    res.status(500).json({ error: 'Server error during search' })
+  }
+})
+
+// ==================================================================================================
+//api thêm nguyên liệu từ dishdetail vào unava
+app.post('/add-unavailable-ingredient', async (req, res) => {
+  const { userId, ingredientID, quality } = req.body
+  try {
+    const user = await User.findById(userId)
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+    const existingIngredient = user.unavailableIngredients.find(
+      (item) => item.ingredientID.toString() === ingredientID,
+    )
+
+    if (existingIngredient) {
+      existingIngredient.quality += quality
+    } else {
+      user.unavailableIngredients.push({
+        ingredientID,
+        quality,
+      })
+    }
+    await user.save()
+    res.status(200).json({ message: 'Ingredient added/updated successfully', user })
+  } catch (error) {
+    console.error('Error adding unavailable ingredient:', error)
+    res.status(500).json({ message: 'Server error' })
+  }
+})
+
+// api xóa nguyên liệu trong unava -> ava
+app.post('/move-ingredient-to-available', async (req, res) => {
+  const { userId, ingredientID } = req.body
+  try {
+    const user = await User.findById(userId)
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+    const ingredientIndex = user.unavailableIngredients.findIndex(
+      (item) => item.ingredientID.toString() === ingredientID,
+    )
+    if (ingredientIndex > -1) {
+      const ingredientToMove = user.unavailableIngredients[ingredientIndex]
+      const existingIngredient = user.availableIngredients.find(
+        (item) => item.ingredientID.toString() === ingredientID,
+      )
+      if (existingIngredient) {
+        existingIngredient.quality += ingredientToMove.quality
+      } else {
+        user.availableIngredients.push({
+          ingredientID: ingredientToMove.ingredientID,
+          quality: ingredientToMove.quality,
+        })
+      }
+      user.unavailableIngredients.splice(ingredientIndex, 1)
+      await user.save()
+      return res.status(200).json({
+        message: 'Ingredient moved to availableIngredients successfully',
+        user,
+      })
+    } else {
+      return res.status(404).json({
+        message: 'Ingredient not found in unavailableIngredients',
+      })
+    }
+  } catch (error) {
+    console.error('Error moving ingredient:', error)
+    res.status(500).json({ message: 'Server error' })
+  }
+})
+
+// Xóa nguyên liệu trong ava
+app.post('/remove-available-ingredient', async (req, res) => {
+  const { userId, ingredientID } = req.body;
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    user.availableIngredients = user.availableIngredients.filter(
+      (item) => item.ingredientID.toString() !== ingredientID
+    );
+    await user.save();
+    res.status(200).json({
+      message: 'Ingredient removed successfully',
+      availableIngredients: user.availableIngredients,
+    });
+  } catch (error) {
+    console.error('Error removing unavailable ingredient:', error);
+    res.status(500).json({ message: 'Server error', error });
+  }
+});
+
+// viết api, hỏi duy cách xử lý ảnh khi upload lên từ điện thoại
+
 const PORT = 5000
 app.listen(PORT, () => {
   console.log(`Server running at http://192.168.1.13:${PORT}`)

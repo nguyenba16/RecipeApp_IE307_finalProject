@@ -13,36 +13,6 @@ import { useNavigation } from '@react-navigation/native'
 const Tab = createBottomTabNavigator()
 const Stack = createStackNavigator()
 
-// Stack Navigator cho Home
-function HomeStack() {
-  return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name='HomeMain' component={HomeScreen} />
-      <Stack.Screen name='DishDetail' component={DishDetail} />
-    </Stack.Navigator>
-  )
-}
-
-// Stack Navigator cho Search
-function SearchStack() {
-  return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name='SearchMain' component={SearchScreen} />
-      <Stack.Screen name='DishDetail' component={DishDetail} />
-    </Stack.Navigator>
-  )
-}
-
-// Stack Navigator cho Profile
-function ProfileStack() {
-  return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name='ProfileMain' component={AccountScreen} />
-      <Stack.Screen name='DishDetail' component={DishDetail} />
-    </Stack.Navigator>
-  )
-}
-
 export default function MainBottom() {
   const navigation = useNavigation()
 
@@ -79,14 +49,14 @@ export default function MainBottom() {
       >
         <Tab.Screen
           name='Home'
-          component={HomeStack}
+          component={HomeScreen}
           options={{
             tabBarItemStyle: { marginRight: 5 },
           }}
         />
         <Tab.Screen
           name='Search'
-          component={SearchStack}
+          component={SearchScreen}
           options={{
             tabBarItemStyle: { marginRight: 60 },
           }}
@@ -94,7 +64,7 @@ export default function MainBottom() {
         <Tab.Screen name='Groceries' component={GroceriesScreen} />
         <Tab.Screen
           name='Profile'
-          component={ProfileStack}
+          component={AccountScreen}
           options={{
             tabBarItemStyle: { marginLeft: 5 },
           }}
@@ -106,6 +76,7 @@ export default function MainBottom() {
           <Ionicons name='add' size={50} color='white' />
         </TouchableOpacity>
       </View>
+      
     </Fragment>
   )
 }

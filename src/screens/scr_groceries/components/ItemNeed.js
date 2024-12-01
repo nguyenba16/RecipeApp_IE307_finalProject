@@ -1,21 +1,41 @@
-import { View, Text, StyleSheet, Image } from 'react-native'
-import { useState } from 'react'
-import CheckBox from 'react-native-check-box'
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
+import axios from 'axios'
+import { AuthContext } from '../../../components/AuthContext'
+import {useContext } from 'react'
+import Icon from 'react-native-vector-icons/FontAwesome'
 
-export default function ItemNeed({ ingredient }) {
-  const [check, setCheck] = useState(false)
+const api = axios.create({
+  baseURL: 'http://192.168.56.1:5000',
+})
+
+export default function ItemNeed({ ingredient, onUpdate }){
+  const { user } = useContext(AuthContext)
+  const handleAddIngredientstoAva = async () => {
+    try {
+      const req = {
+        userId: user.id,
+        ingredientID: ingredient.ingredientID._id,
+      }
+      const response = await api.post('/move-ingredient-to-available', req)
+      if (response.status === 200) {
+        onUpdate()
+      }
+    } catch (error) {
+      console.error('Error: ', error)
+    }
+  }
+
   return (
     <View style={styles.container}>
-      <Image style={styles.img} source={ingredient.img} />
-      <Text style={styles.name}>{ingredient.name}</Text>
-      <Text style={styles.quality}>{ingredient.quality}</Text>
-      <Text style={styles.dvi}>{ingredient.dvi}</Text>
-      <CheckBox
-        style={styles.check}
-        checkBoxColor='#FF9320'
-        isChecked={check}
-        onClick={() => setCheck(!check)}
-      />
+      <Image style={styles.img} source={{ uri: ingredient.ingredientID.imgIngredient }} />
+      <Text style={styles.name}>{ingredient.ingredientID.IngredientName}</Text>
+      <Text style={styles.quality}>
+        {' '}
+        {ingredient.quality} {ingredient.ingredientID.unit}
+      </Text>
+      <TouchableOpacity onPress={handleAddIngredientstoAva} style = {styles.btn}>
+        <Icon name='check' size={25} color={'green'}></Icon>
+      </TouchableOpacity>
     </View>
   )
 }
@@ -23,36 +43,33 @@ export default function ItemNeed({ ingredient }) {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    paddingHorizontal: 20,
+    paddingHorizontal: 15,
     borderRadius: 10,
-    paddingTop: 15,
-    paddingBottom: 10,
-    marginHorizontal: 10,
-    borderColor: '#E8E8E8',
-    borderBottomWidth: 1,
+    paddingVertical: 10,
+    marginHorizontal: 'auto',
+    marginVertical: 3,
+    width: '95%',
     backgroundColor: 'white',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 5,
   },
   img: {
-    height: 30,
-    width: 30,
+    height: 40,
+    width: 40,
+    borderRadius: 100,
     marginRight: 10,
   },
   name: {
-    fontSize: 18,
-    width: '50%',
+    width: '40%',
+    fontSize: 15,
+    fontWeight: 700,
   },
   quality: {
-    width: '10%',
-    textAlign: 'right',
-    fontSize: 18,
+    width: '35%',
+    fontSize: 15,
   },
-  dvi: {
-    fontSize: 18,
-    width: '10%',
-    marginLeft: 5,
-  },
-  check: {
-    marginLeft: 30,
-    paddingTop: 2,
-  },
+  btn: {
+    padding: 5,
+  }
 })
