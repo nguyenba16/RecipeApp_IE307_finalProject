@@ -227,9 +227,11 @@ export default function NewRecipe() {
                 size={30}
                 color='#FF9320'
               />
-              <Text style={styles.text_upload}>Tải ảnh đại diện cho món ăn của bạn</Text>
+              <Text style={styles.text_upload}>Tải ảnh đại diện cho món ăn của bạn</Text>              
             </View>
+           
           )}
+          
         </TouchableOpacity>
         {/* Nhập tên món ăn */}
         <TextInput

@@ -18,8 +18,7 @@ export default function ItemStep({method, setmethod}) {
                style={{ justifyContent: "center",marginLeft:5, alignItems: "center"}}>
                 <Ionicons  name='trash-outline' size={25} color='#FF9320' />                
               </TouchableOpacity>              
-            </View>
-            
+            </View>            
             <Text
                 style={styles.text_method}
               >{step.detail}</Text>
