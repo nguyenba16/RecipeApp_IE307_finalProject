@@ -1,24 +1,90 @@
 import React from 'react'
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-  Button,
-  Image,
-  Alert,
-} from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, Alert } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import * as ImagePicker from 'expo-image-picker'
 import { useState } from 'react'
 import RNPickerSelect from 'react-native-picker-select'
+import ItemIngre from './components/ItemIngre'
+import ItemStep from './components/ItemStep'
+import { useEffect, useContext } from 'react'
+import { useNavigation } from '@react-navigation/native'
+import axios from 'axios'
+import { AuthContext } from '../../components/AuthContext'
 
-export default function NewRecipe({ navigation }) {
+const api = axios.create({
+  baseURL: 'http://192.168.56.1:5000',
+})
+
+const ListIngre = [
+  {
+    key: 1,
+    name: 'Ngữ vị hương',
+    dvi: 'kg',
+    img: require('../../../assets/icons/logo.png'),
+  },
+  {
+    key: 2,
+    name: 'Cá',
+    dvi: 'kg',
+    img: require('../../../assets/icons/logo.png'),
+  },
+  {
+    key: 3,
+    name: 'Rau',
+    dvi: 'kg',
+    img: require('../../../assets/icons/logo.png'),
+  },
+  {
+    key: 4,
+    name: 'Đường',
+    dvi: 'kg',
+    img: require('../../../assets/icons/logo.png'),
+  },
+  {
+    key: 5,
+    name: 'Muối',
+    dvi: 'gam',
+    img: require('../../../assets/icons/logo.png'),
+  },
+]
+
+export default function NewRecipe() {
+  const { user } = useContext(AuthContext)
+  const naviagtion = useNavigation()
+  //Kiểm soát các trường thông tin nhập vào
+  const [stateShare, setStateShare] = useState(false)
+  useEffect(() => {
+    console.log(photo, nameDish, desc, serving, timecook, cate, ListAddIngre, method)
+    if (
+      photo != '' &&
+      nameDish != '' &&
+      desc != '' &&
+      serving != null &&
+      timecook != null &&
+      cate != null &&
+      ListAddIngre.length > 0 &&
+      method.length > 0
+    ) {
+      setStateShare(true)
+    } else {
+      setStateShare(false)
+    }
+  }, [
+    { photo },
+    { nameDish },
+    { desc },
+    { serving },
+    { timecook },
+    { cate },
+    { ListAddIngre },
+    { method },
+  ])
+
   //Nhận đường dẫn của ảnh món ăn
-  const [photo, setPhoto] = useState()
+  const [photo, setPhoto] = useState('')
+
   const openImage = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync()
     if (permissionResult.granted === false) {
@@ -33,52 +99,39 @@ export default function NewRecipe({ navigation }) {
     })
     if (!result.canceled) {
       setPhoto(result.assets[0].uri)
+      console.log(photo)
     }
   }
-  const ListIngre = [
-    {
-      key: 1,
-      name: 'Ngữ vị hương',
-      dvi: 'kg',
-      img: require('../../assets/icons/logo.png'),
-    },
-    {
-      key: 2,
-      name: 'Cá',
-      dvi: 'kg',
-      img: require('../../assets/icons/logo.png'),
-    },
-    {
-      key: 3,
-      name: 'Rau',
-      dvi: 'kg',
-      img: require('../../assets/icons/logo.png'),
-    },
-    {
-      key: 4,
-      name: 'Đường',
-      dvi: 'kg',
-      img: require('../../assets/icons/logo.png'),
-    },
-    {
-      key: 5,
-      name: 'Muối',
-      dvi: 'gam',
-      img: require('../../assets/icons/logo.png'),
-    },
-  ]
-
+  const [ingredients, setIngredients] = useState()
+  const fetchIngredients = async () => {
+    try {
+      const response = await api.get('/all-ingredients')
+      if (response.status === 200) {
+        setIngredients(response.data)
+      } else {
+        console.error('Failed to fetch ingredients:', response.data.message)
+      }
+    } catch (error) {
+      console.error('Error fetching ingredients:', error.message)
+    }
+  }
+  useEffect(() => {
+    fetchIngredients()
+  }, [])
   //Nhận giá trị của tên món ăn
-  const [nameDish, setNameDish] = useState()
+  const [nameDish, setNameDish] = useState('')
 
   //Nhận giá trị của mô tả
-  const [desc, setDesc] = useState()
+  const [desc, setDesc] = useState('')
 
   //Nhận giá trị khẩu phần ăn
-  const [serving, setServing] = useState()
+  const [serving, setServing] = useState(null)
 
   //Nhận giá trị thời gian nấu
-  const [timecook, setTimecook] = useState()
+  const [timecook, setTimecook] = useState(null)
+
+  //Nhận giá trị loại gian nấu
+  const [cate, setCate] = useState(null)
 
   //Nhận mảng các nguyên liệu
   const [ingredient, setIngredient] = useState()
@@ -86,7 +139,7 @@ export default function NewRecipe({ navigation }) {
   //Nhận img của từng nguyên liệu
   const [imgIngre, setImgIngre] = useState()
   //Nhận giá trị của số lượng
-  const [quality, setQuality] = useState()
+  const [quality, setQuality] = useState(0)
   //Nhận giá trị của đơn vị
   const [dvi, setDvi] = useState('Đơn vị')
   const handleIngredientChange = (value) => {
@@ -105,17 +158,28 @@ export default function NewRecipe({ navigation }) {
     if (value != null) {
       const newIngredient = { id: value, quality: quality }
       setListAddIngre([...ListAddIngre, newIngredient]) // Đặt lại các giá trị sau khi thêm
-      setIngredient()
+      setIngredient(null)
       setQuality(0)
+      setStateIngre(false)
     }
   }
+  //Xóa nguyên liệu ra khỏi danh sách
+  const removeIngre = (ingre) => {
+    const newArray = ListAddIngre.filter((element) => element !== ingre)
+    setListAddIngre(newArray)
+  }
+  //Kiểm soát giá trị thêm vào mảng nguyên liệu
+  const [stateIngre, setStateIngre] = useState(false)
+  useEffect(() => {
+    if (ingredient != null && quality != 0) {
+      setStateIngre(true)
+    }
+  }, [{ ingredient }, { quality }])
 
-  //Nhận giá trị thứ tự bước
-  const [numberstep, setNumberstep] = useState(1)
   //Nhận giá trị của tiêu đề từng bước
-  const [titleMethod, setTitleMethod] = useState()
+  const [titleMethod, setTitleMethod] = useState('')
   //Nhận đường dẫn của ảnh từng bước thực hiện
-  const [imgMethod, setImgMethod] = useState()
+  const [imgMethod, setImgMethod] = useState('')
   const openImageMethod = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync()
     if (permissionResult.granted === false) {
@@ -133,37 +197,47 @@ export default function NewRecipe({ navigation }) {
     }
   }
   //Nhận giá trị mô tả chi tiết cho từng bước
-  const [detailMethod, setDetailMethod] = useState()
+  const [detailMethod, setDetailMethod] = useState('')
   //Danh sách các bước thực hiện
   const [method, setMethod] = useState([])
   const addMethodStep = () => {
-    const newStep = {
-      numberstep: numberstep,
-      title: titleMethod,
-      image: imgMethod,
-      detail: detailMethod,
+    if (titleMethod != '' && detailMethod != '') {
+      const newStep = { title: titleMethod, image: imgMethod, detail: detailMethod }
+      setMethod([...method, newStep])
     }
-    setMethod([...method, newStep]) // Đặt lại các giá trị sau khi thêm
-    setNumberstep(numberstep + 1)
+    // Đặt lại các giá trị sau khi thêm
     setTitleMethod('')
-    setImgMethod()
+    setImgMethod(null)
     setDetailMethod('')
+    setStaeMethod(false)
   }
+  //Kiểm soát giá trị thêm vào ds các bước
+  const [stateMethod, setStaeMethod] = useState(false)
+  useEffect(() => {
+    if (titleMethod != '' && imgMethod != '' && detailMethod != '') {
+      setStaeMethod(true)
+    }
+  }, [{ titleMethod }, { imgMethod }, { detailMethod }])
+
   return (
     <SafeAreaView style={styles.container}>
       {/* header */}
       <View style={styles.title}>
         {/* Back button */}
         <View style={{ flexDirection: 'row' }}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <TouchableOpacity onPress={() => naviagtion.goBack()}>
             <Ionicons name='arrow-back-outline' size={30} color='white' />
           </TouchableOpacity>
           <Text style={styles.text_create}>Tạo công thức</Text>
         </View>
 
         {/* Share button */}
-        <TouchableOpacity style={styles.touch_share}>
-          <Text style={styles.text_touch}>Chia sẻ</Text>
+        <TouchableOpacity
+          style={stateShare ? styles.touch_share_true : styles.touch_share_false}
+          disabled={!stateShare}
+          onPress={() => Alert.alert('na')}
+        >
+          <Text style={stateShare ? styles.text_touch_true : styles.text_touch_false}>Chia sẻ</Text>
         </TouchableOpacity>
       </View>
       {/* Màn hình nhập các thông tin */}
@@ -193,34 +267,28 @@ export default function NewRecipe({ navigation }) {
           placeholder='Tên món ăn'
           multiline={true}
           value={nameDish}
-          onChange={setNameDish}
+          onChangeText={setNameDish}
         />
         {/* Nhập mô tả món ăn */}
         <TextInput
           style={styles.text_note}
+          keyboardType='default'
           placeholder='Hãy viết dòng chia sẻ về món ăn của bạn'
           multiline={true}
           value={desc}
-          onChange={setDesc}
+          onChangeText={setDesc}
         />
         {/* Nhập khẩu phần ăn */}
         <View style={styles.serving}>
           <Text style={styles.text_serving}>Khẩu phần</Text>
-          <View style={styles.inputtext_serving}>
-            <RNPickerSelect
-              placeholder={{ label: 'Khẩu phần', value: null }}
-              value={serving}
-              onValueChange={(value) => setServing(value)}
-              items={[
-                { label: '1 người', value: 1 },
-                { label: '2 người', value: 2 },
-                { label: '3 người', value: 3 },
-                { label: '3 người', value: 3 },
-                { label: '4 người', value: 4 },
-                { label: '5 người', value: 5 },
-                { label: '6 người', value: 6 },
-              ]}
+          <View style={styles.input_serving_box}>
+            <TextInput
+              keyboardType='number-pad'
+              style={styles.input_serving}
+              placeholder='Số khẩu phần'
+              onChangeText={setServing}
             />
+            <Text>người</Text>
           </View>
         </View>
         {/* Nhập thời gian nấu ăn */}
@@ -243,9 +311,42 @@ export default function NewRecipe({ navigation }) {
             />
           </View>
         </View>
-
+        {/* Chọn loại món ăn */}
+        <View style={styles.serving}>
+          <Text style={styles.text_serving}>Loại món ăn</Text>
+          <View style={styles.inputtext_serving}>
+            <RNPickerSelect
+              placeholder={{ label: 'Loại món ăn', value: null }}
+              value={cate}
+              onValueChange={(value) => setCate(value)}
+              items={[
+                { label: 'Miền Bắc', value: 'Miền Bắc' },
+                { label: 'Miền Nam', value: 'Miền Nam' },
+                { label: 'Miền Trung', value: 'Miền Trung' },
+              ]}
+            />
+          </View>
+        </View>
         {/* Danh sách các nguyên liệu */}
         <Text style={styles.title_ingredient}>Nguyên liệu</Text>
+        {ListAddIngre.map((ingre, index) => (
+          <View key={index}>
+            {ingredients.map((item) => {
+              if (ingre.id === item.key) {
+                return (
+                  <View key={item.key}>
+                    <ItemIngre
+                      ingredient={item}
+                      quality={ingre.quality}
+                      remove={() => removeIngre(ingre)}
+                    />
+                  </View>
+                )
+              }
+            })}
+          </View>
+        ))}
+
         <View style={styles.ingredient}>
           <View style={styles.background_img_ingre}>
             <Image style={styles.img_ingre} source={imgIngre} />
@@ -261,41 +362,45 @@ export default function NewRecipe({ navigation }) {
           </View>
           {/* Nhập số lượng nguyên liệu */}
           <TextInput
-            keyboardType='numeric'
+            keyboardType='number-pad'
             style={styles.text_quality}
-            placeholder='Số lượng'
+            placeholder='0'
             value={quality}
-            onChange={setQuality}
+            onChangeText={setQuality}
           />
           {/* Đơn vị nguyên liệu */}
           <Text style={styles.text_dvi}>{dvi}</Text>
         </View>
-        <TouchableOpacity style={styles.add_ingre} onPress={() => AddIngredient(ingredient)}>
+        <TouchableOpacity
+          style={styles.add_ingre}
+          disabled={!stateIngre}
+          onPress={() => AddIngredient(ingredient)}
+        >
           <Ionicons style={styles.icon_add} name='add-outline' size={25} color='black' />
           <Text style={styles.text_add}>Thêm nguyên liệu</Text>
         </TouchableOpacity>
 
         <Text style={styles.title_ingredient}>Các bước thực hiện</Text>
 
+        <ItemStep method={method} setmethod={setMethod} />
         <View style={styles.methodcook}>
+          {/* Thứ tự bước thực hiện */}
+          <Text style={styles.method_number}>Bước {method.length + 1} :</Text>
           <View style={styles.title_method}>
-            {/* Thứ tự bước thực hiện */}
-            <Text style={styles.method_number}>{numberstep}</Text>
             {/* Nhập title bước thực hiện */}
             <TextInput
               style={styles.text_title_method}
               placeholder='Tóm tắt bước thực hiện'
               value={titleMethod}
-              onChange={setTitleMethod}
+              onChangeText={setTitleMethod}
             />
           </View>
           <View style={styles.title_method}>
-            <Text style={{ width: '10%' }}></Text>
             {/* Thêm ảnh cho bước thực hiện */}
             <TouchableOpacity style={styles.upload_method} onPress={openImageMethod}>
               {imgMethod ? (
                 <Image
-                  source={{ uri: photo }}
+                  source={{ uri: imgMethod }}
                   style={{ width: '100%', height: '100%', borderRadius: 5 }}
                 />
               ) : (
@@ -314,10 +419,15 @@ export default function NewRecipe({ navigation }) {
               style={styles.text_method}
               placeholder='Mô tả chi tiết thực hiện'
               value={detailMethod}
-              onChange={setDetailMethod}
+              onChangeText={setDetailMethod}
             />
           </View>
-          <TouchableOpacity onPress={addMethodStep} style={styles.add_method}>
+
+          <TouchableOpacity
+            onPress={addMethodStep}
+            style={styles.add_method}
+            disabled={!stateMethod}
+          >
             <Ionicons style={styles.icon_add} name='add-outline' size={25} color='black' />
             <Text style={styles.text_add}>Thêm bước</Text>
           </TouchableOpacity>
@@ -349,11 +459,11 @@ const styles = StyleSheet.create({
   text_create: {
     marginLeft: 10,
     alignSelf: 'center',
-    fontSize: 18,
+    fontSize: 20,
     color: 'white',
     fontWeight: 'bold',
   },
-  touch_share: {
+  touch_share_true: {
     backgroundColor: 'white',
     height: 35,
     width: 100,
@@ -362,22 +472,36 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     fontSize: 15,
   },
-  text_touch: {
+  text_touch_true: {
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
     color: '#FF9320',
   },
+  touch_share_false: {
+    backgroundColor: '#DDDDDD',
+    height: 35,
+    width: 100,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    fontSize: 15,
+  },
+  text_touch_false: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: 'gray',
+  },
   touch_up_img: {
     height: 300,
-    marginTop: 5,
     borderColor: '#CFCFCF',
     borderStyle: 'dashed',
     borderRadius: 5,
     borderWidth: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: 10,
+    marginBottom: 10,
     backgroundColor: '#F5F5F5',
   },
   text_upload: {
@@ -404,6 +528,10 @@ const styles = StyleSheet.create({
     margin: 10,
     marginHorizontal: 15,
   },
+  input_serving: {
+    padding: 10,
+    backgroundColor: '#F5F5F5',
+  },
   serving: {
     flexDirection: 'row',
     marginVertical: 10,
@@ -425,6 +553,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#F5F5F5',
   },
+  input_serving_box: {
+    alignItems: 'center',
+    gap: 5,
+    flexDirection: 'row',
+  },
   title_ingredient: {
     fontSize: 20,
     fontWeight: 'bold',
@@ -435,12 +568,13 @@ const styles = StyleSheet.create({
   ingredient: {
     width: '90%',
     marginTop: 15,
-    height: 60,
+    height: 40,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginHorizontal: 20,
     backgroundColor: '#F5F5F5',
+    borderRadius: 5,
   },
   background_img_ingre: {
     width: '10%',
@@ -449,6 +583,7 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     backgroundColor: '#F5F5F5',
     textAlignVertical: 'center',
+    borderRadius: 5,
   },
   img_ingre: {
     height: 30,
@@ -459,12 +594,10 @@ const styles = StyleSheet.create({
     fontSize: 15,
     alignContent: 'center',
     textAlign: 'center',
-    height: 60,
   },
   text_quality: {
     width: '20%',
     fontSize: 16,
-    height: 60,
     textAlign: 'right',
     textAlignVertical: 'center',
   },
@@ -493,7 +626,6 @@ const styles = StyleSheet.create({
   },
   methodcook: {
     width: '90%',
-    marginTop: 10,
     marginHorizontal: 20,
   },
   title_method: {
@@ -505,24 +637,23 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   method_number: {
-    width: '8%',
-    fontSize: 15,
-    height: '80%',
-    backgroundColor: '#FF9320',
+    fontSize: 18,
     textAlign: 'center',
     borderRadius: 100,
     textAlignVertical: 'center',
-    color: 'white',
     margin: 3,
+    marginTop: 20,
+    textAlign: 'left',
+    fontWeight: '500',
   },
   text_title_method: {
-    width: '88%',
+    width: '100%',
     fontSize: 15,
     borderRadius: 5,
     backgroundColor: '#F5F5F5',
   },
   upload_method: {
-    width: '28%',
+    width: '30%',
     height: 100,
     justifyContent: 'center',
     borderStyle: 'dashed',
@@ -532,14 +663,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
   },
   text_method: {
-    width: '58%',
+    width: '68%',
     height: 100,
     fontSize: 15,
     borderRadius: 5,
     backgroundColor: '#F5F5F5',
     textAlignVertical: 'top',
     textAlign: 'center',
-    paddingLeft: 10,
   },
   add_method: {
     marginTop: 70,

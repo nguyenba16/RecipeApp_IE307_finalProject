@@ -17,15 +17,15 @@ export default function MyItemRecipe({ Recipe }) {
 
   const handleDeleteRecipe = async () => {
     Alert.alert(
-      "Xác nhận xóa công thức",
-      "Bạn có chắc chắn muốn xóa công thức này ra khỏi công thức của bạn không?",
+      'Xác nhận xóa công thức',
+      'Bạn có chắc chắn muốn xóa công thức này ra khỏi công thức của bạn không?',
       [
         {
-          text: "Không",
-          style: "cancel"
+          text: 'Không',
+          style: 'cancel',
         },
         {
-          text: "Có",
+          text: 'Có',
           onPress: async () => {
             const recipeId = Recipe._id
             try {
@@ -38,11 +38,14 @@ export default function MyItemRecipe({ Recipe }) {
                 console.log('Recipe deleted:', response.data.message)
               }
             } catch (error) {
-              console.error('Error deleting recipe:', error.response ? error.response.data : error.message)
+              console.error(
+                'Error deleting recipe:',
+                error.response ? error.response.data : error.message,
+              )
             }
-          }
-        }
-      ]
+          },
+        },
+      ],
     )
   }
 

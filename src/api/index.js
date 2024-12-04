@@ -113,28 +113,37 @@ app.post('/signin', async (req, res) => {
   }
 })
 
-// Sign up
+// Sign up https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-4.jpg
 app.post('/signup', async (req, res) => {
   try {
-    const { email, phone, password, userName, avatar_URL } = req.body
-    // Kiểm tra tính hợp lệ của email
+    const { email, phone, password, userName } = req.body
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!email || !emailRegex.test(email)) {
       return res.status(400).json({ message: 'Invalid email format' })
     }
-
-    // Kiểm tra tính hợp lệ của số điện thoại
-    const phoneRegex = /^[0-9]{10,11}$/ // Kiểm tra số điện thoại dạng 10-11 chữ số
+    const phoneRegex = /^[0-9]{10,11}$/
     if (!phone || !phoneRegex.test(phone)) {
       return res.status(400).json({ message: 'Invalid phone number format' })
     }
-    const newUser = new User({ email, phone, password, userName, avatar_URL })
+    const existingUser = await User.findOne({ $or: [{ email }, { userName }] })
+    if (existingUser) {
+      return res.status(400).json({ message: 'Email or Username already exists' })
+    }
+    const newUser = new User({
+      userName,
+      email,
+      phone,
+      password,
+      avatar_URL: 'https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-4.jpg',
+      availableIngredients: [],
+      unavailableIngredients: [],
+    })
     const savedUser = await newUser.save()
     console.log('Sign Up successfully', savedUser)
     res.status(201).json(savedUser)
   } catch (error) {
-    console.error('Error', error)
-    res.status(500).send(error)
+    console.error('Error sign up:', error)
+    res.status(500).json({ message: 'Internal server error', error: error.message })
   }
 })
 
@@ -527,29 +536,41 @@ app.post('/move-ingredient-to-available', async (req, res) => {
 
 // Xóa nguyên liệu trong ava
 app.post('/remove-available-ingredient', async (req, res) => {
-  const { userId, ingredientID } = req.body;
+  const { userId, ingredientID } = req.body
   try {
-    const user = await User.findById(userId);
+    const user = await User.findById(userId)
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: 'User not found' })
     }
     user.availableIngredients = user.availableIngredients.filter(
-      (item) => item.ingredientID.toString() !== ingredientID
-    );
-    await user.save();
+      (item) => item.ingredientID.toString() !== ingredientID,
+    )
+    await user.save()
     res.status(200).json({
       message: 'Ingredient removed successfully',
       availableIngredients: user.availableIngredients,
-    });
+    })
   } catch (error) {
-    console.error('Error removing unavailable ingredient:', error);
-    res.status(500).json({ message: 'Server error', error });
+    console.error('Error removing unavailable ingredient:', error)
+    res.status(500).json({ message: 'Server error', error })
   }
-});
+})
+
+// api lấy tất cả nguyên liệu
+app.get('/all-ingredients', async (req, res) => {
+  try {
+    const ingredients = await Ingredient.find()
+    console.log(ingredients)
+    res.json(ingredients)
+  } catch (error) {
+    console.error('Error fetching users:', error)
+    res.status(500).send(error)
+  }
+})
 
 // viết api, hỏi duy cách xử lý ảnh khi upload lên từ điện thoại
 
 const PORT = 5000
 app.listen(PORT, () => {
-  console.log(`Server running at http://192.168.1.13:${PORT}`)
+  console.log(`Server running at http://192.168.56.1:${PORT}`)
 })

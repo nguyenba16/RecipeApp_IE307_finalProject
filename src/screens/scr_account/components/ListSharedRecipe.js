@@ -3,7 +3,7 @@ import { StyleSheet, View, Text } from 'react-native'
 import MyItemRecipe from './myrecipeItem'
 import { ScrollView } from 'react-native'
 import axios from 'axios'
-import { useState, useContext, useEffect } from 'react'
+import { useState, useContext } from 'react'
 import { AuthContext } from '../../../components/AuthContext'
 import { useFocusEffect } from '@react-navigation/native'
 const api = axios.create({
@@ -32,7 +32,7 @@ export default function ListSharedRecipe() {
   useFocusEffect(
     React.useCallback(() => {
       fetchMyRecipes()
-    }, []) 
+    }, []),
   )
   return (
     <View style={styles.container}>

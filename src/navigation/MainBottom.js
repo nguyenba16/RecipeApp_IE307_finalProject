@@ -76,7 +76,6 @@ export default function MainBottom() {
           <Ionicons name='add' size={50} color='white' />
         </TouchableOpacity>
       </View>
-      
     </Fragment>
   )
 }

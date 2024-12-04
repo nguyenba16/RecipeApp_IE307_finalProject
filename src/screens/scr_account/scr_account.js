@@ -4,14 +4,14 @@ import ListSavedRecipe from './components/ListSavedRecipe'
 import ListSharedRecipe from './components/ListSharedRecipe'
 import { useNavigation } from '@react-navigation/native'
 import { AuthContext } from '../../components/AuthContext'
-import {useContext } from 'react'
+import { useContext } from 'react'
 
 const Tab = createMaterialTopTabNavigator()
 
 export default function ProfileScreen() {
   const { user } = useContext(AuthContext)
   const navigation = useNavigation()
-  
+
   return (
     <View style={styles.container}>
       <View style={styles.backgroundTitle}>
@@ -19,16 +19,9 @@ export default function ProfileScreen() {
           onPress={() => navigation.navigate('InfoUser')}
           style={[styles.user, styles.userLayout]}
         >
-          <Text style={[styles.name]}>Cao Quốc Kiệt</Text>
-          <Text style={[styles.email]}>caokiet@gmail.com</Text>
-          <Image
-            style={[styles.avatar]}
-            resizeMode='cover'
-            source={require('../../../assets/icons/logo.png')}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.backgroung_setting} onPress={() => alert('Setting')}>
-          <Image resizeMode='cover' source={require('../../../assets/icons/setting.png')} />
+          <Text style={[styles.name]}>{user.userName}</Text>
+          <Text style={[styles.email]}>{user.email}</Text>
+          <Image style={[styles.avatar]} resizeMode='cover' source={{ uri: user.avatar_URL }} />
         </TouchableOpacity>
       </View>
       <Tab.Navigator
@@ -75,8 +68,8 @@ const styles = StyleSheet.create({
   avatar: {
     left: 10,
     borderRadius: 100,
-    width: 65,
-    height: 65,
+    width: 60,
+    height: 60,
   },
   name: {
     top: 5,
@@ -85,8 +78,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     width: 500,
     height: 50,
-    display: 'flex',
-    textAlign: 'left',
     left: 82,
     position: 'absolute',
   },
@@ -94,12 +85,8 @@ const styles = StyleSheet.create({
     top: 32,
     fontSize: 15,
     color: '#000',
-    width: 148,
-    height: 30,
     opacity: 0.5,
     alignItems: 'center',
-    display: 'flex',
-    textAlign: 'left',
     left: 84,
     position: 'absolute',
   },

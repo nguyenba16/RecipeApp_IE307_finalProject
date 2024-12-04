@@ -1,4 +1,4 @@
-import { View, StyleSheet, Image, TextInput, TouchableOpacity } from 'react-native'
+import { View, StyleSheet, Image, Text, TextInput, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import ItemRecipe from '../components/ItemRecipe'
 import { useEffect, useState } from 'react'
@@ -13,6 +13,7 @@ export default function SearchScreen({ route }) {
   const [searchValue, setSearchValue] = useState('')
   const [category, setCategrory] = useState(cate || '')
   const [recipes, setRecipes] = useState([])
+  const [hasResult, setHasResult] = useState(true)
 
   const fetchRecipes = async () => {
     try {
@@ -22,8 +23,10 @@ export default function SearchScreen({ route }) {
       }
       const res = await api.post('/search', requestData)
       setRecipes(res.data.recipes || [])
+      setHasResult(true)
     } catch (error) {
-      console.error('Error fetching recipes: ', error)
+      if (searchValue) setHasResult(false)
+      console.error('Không tìm thấy món ăn phù hợp')
     }
   }
 
@@ -59,11 +62,17 @@ export default function SearchScreen({ route }) {
           </TouchableOpacity>
         </View>
       </View>
-      <ScrollView>
-        {recipes.map((recipe, index) => (
-          <ItemRecipe key={index} Recipe={recipe} />
-        ))}
-      </ScrollView>
+      {!hasResult ? (
+        <View style={styles.err_box}>
+          <Text style={styles.text_err}>Không có công thức nào phù hợp!</Text>
+        </View>
+      ) : (
+        <ScrollView>
+          {recipes.map((recipe, index) => (
+            <ItemRecipe key={index} Recipe={recipe} />
+          ))}
+        </ScrollView>
+      )}
     </View>
   )
 }
@@ -103,5 +112,13 @@ const styles = StyleSheet.create({
   icon_search: {
     height: 30,
     width: 30,
+  },
+  err_box: {
+    height: '90%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  text_err: {
+    textAlign: 'center',
   },
 })

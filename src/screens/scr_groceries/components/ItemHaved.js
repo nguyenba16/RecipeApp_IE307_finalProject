@@ -9,7 +9,7 @@ const api = axios.create({
 })
 
 export default function ItemNeed({ ingredient, onUpdate }) {
-  const { user } = useContext(AuthContext) 
+  const { user } = useContext(AuthContext)
 
   const handleRemoveIngredientInUnava = async () => {
     console.log(ingredient.ingredientID._id)
@@ -27,7 +27,7 @@ export default function ItemNeed({ ingredient, onUpdate }) {
       console.error('Error: ', error)
     }
   }
-  
+
   return (
     <View style={styles.container}>
       <Image style={styles.img} source={{ uri: ingredient.ingredientID.imgIngredient }} />

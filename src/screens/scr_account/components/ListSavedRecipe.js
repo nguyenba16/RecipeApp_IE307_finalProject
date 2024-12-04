@@ -11,7 +11,6 @@ const api = axios.create({
   baseURL: 'http://192.168.56.1:5000',
 })
 
-
 export default function ListSavedRecipe() {
   const { user } = useContext(AuthContext)
   const [hasRecipes, setHasRecipes] = useState(true)
@@ -35,7 +34,7 @@ export default function ListSavedRecipe() {
   useFocusEffect(
     React.useCallback(() => {
       fetchSavedRecipes()
-    }, [])
+    }, []),
   )
   return (
     <View style={styles.container}>

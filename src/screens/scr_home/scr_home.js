@@ -1,14 +1,5 @@
 import React, { useState, useEffect, useContext, useRef } from 'react'
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Image,
-  ImageBackground,
-  FlatList,
-  TouchableOpacity,
-} from 'react-native'
+import { View, Text, StyleSheet, ScrollView, ImageBackground, FlatList } from 'react-native'
 import color from '../../../color'
 import OutStandingDishCard from './components/OutStandingDishCard'
 import axios from 'axios'

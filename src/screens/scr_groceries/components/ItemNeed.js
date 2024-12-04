@@ -1,14 +1,14 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
 import axios from 'axios'
 import { AuthContext } from '../../../components/AuthContext'
-import {useContext } from 'react'
+import { useContext } from 'react'
 import Icon from 'react-native-vector-icons/FontAwesome'
 
 const api = axios.create({
   baseURL: 'http://192.168.56.1:5000',
 })
 
-export default function ItemNeed({ ingredient, onUpdate }){
+export default function ItemNeed({ ingredient, onUpdate }) {
   const { user } = useContext(AuthContext)
   const handleAddIngredientstoAva = async () => {
     try {
@@ -33,7 +33,7 @@ export default function ItemNeed({ ingredient, onUpdate }){
         {' '}
         {ingredient.quality} {ingredient.ingredientID.unit}
       </Text>
-      <TouchableOpacity onPress={handleAddIngredientstoAva} style = {styles.btn}>
+      <TouchableOpacity onPress={handleAddIngredientstoAva} style={styles.btn}>
         <Icon name='check' size={25} color={'green'}></Icon>
       </TouchableOpacity>
     </View>
@@ -71,5 +71,5 @@ const styles = StyleSheet.create({
   },
   btn: {
     padding: 5,
-  }
+  },
 })

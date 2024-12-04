@@ -2,7 +2,7 @@ import { View, StyleSheet, ScrollView, Text } from 'react-native'
 import ItemNeed from './ItemNeed'
 import axios from 'axios'
 import { AuthContext } from '../../../components/AuthContext'
-import { useState, useContext , useEffect} from 'react'
+import { useState, useContext, useEffect } from 'react'
 import { useFocusEffect } from '@react-navigation/native'
 import React from 'react'
 
@@ -48,8 +48,8 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     paddingTop: 5,
-    justifyContent: "center",
-    alignItems: "center"
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   text_err: {
     fontSize: 15,
