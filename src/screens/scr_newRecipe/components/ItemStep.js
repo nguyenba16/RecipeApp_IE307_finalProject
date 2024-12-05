@@ -23,7 +23,6 @@ export default function ItemStep({ method, setmethod }) {
                 <Ionicons name='trash-outline' size={25} color='#FF9320' />
               </TouchableOpacity>
             </View>
-
             <Text style={styles.text_method}>{step.detail}</Text>
             <View style={styles.title_method}>
               <Image source={{ uri: step.image }} style={styles.upload_method} />

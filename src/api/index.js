@@ -10,6 +10,9 @@ import bodyParser from 'body-parser'
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
 import authMiddleware from './authMiddleware.js'
+import multer from 'multer'
+import { Cloudinary } from './config/cloundinaryCofig.js'
+import { CloudinaryStorage } from 'multer-storage-cloudinary'
 
 dotenv.config()
 const app = express()
@@ -568,7 +571,38 @@ app.get('/all-ingredients', async (req, res) => {
   }
 })
 
-// viết api, hỏi duy cách xử lý ảnh khi upload lên từ điện thoại
+const storage = new CloudinaryStorage({
+  cloudinary: Cloudinary,
+  params: {
+    folder: 'IE307_FinalProject', // Thư mục trên Cloudinary
+  },
+})
+const upload = multer({ storage })
+// API để sửa thông tin người dùng
+app.patch('/update-profile', upload.single('avatar_URL'), async (req, res) => {
+  try {
+    const { userID, userName, phone, email } = req.body
+    let avatarUrl = req.body.avatar_URL // Giữ lại avatar cũ nếu không có ảnh mới
+
+    if (req.file) {
+      avatarUrl = req.file.path // URL ảnh mới từ Cloudinary
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userID,
+      { userName, phone, email, avatar_URL: avatarUrl },
+      { new: true },
+    )
+
+    res.status(200).json({
+      message: 'Cập nhật thành công!',
+      data: updatedUser,
+    })
+  } catch (error) {
+    console.error('Error updating profile:', error)
+    res.status(500).json({ message: 'Lỗi khi cập nhật thông tin.' })
+  }
+})
 
 const PORT = 5000
 app.listen(PORT, () => {

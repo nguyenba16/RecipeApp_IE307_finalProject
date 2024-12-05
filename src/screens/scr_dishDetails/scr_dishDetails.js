@@ -30,6 +30,7 @@ export default function DishDetail({ route }) {
   const [isLike, setIsLike] = useState(false)
   const [isSave, setIsSave] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
+  const [showSeeMore, setShowSeeMore] = useState(false)
   const [comment, setComment] = useState('')
   const [ingredients, setIngredients] = useState([])
   const [commentList, setCommentList] = useState([])
@@ -101,6 +102,10 @@ export default function DishDetail({ route }) {
     )
   }
 
+  const handleStartCooking = () => {
+    navigation.navigate('StepRecipe', { recipeSteps: detailDish.cookingSteps })
+  }
+  console.log(detailDish)
   return (
     <View style={styles.container}>
       <ScrollView>
@@ -133,22 +138,48 @@ export default function DishDetail({ route }) {
               <Image style={styles.acc_ava} source={{ uri: detailDish.createdBy.avatar_URL }} />
               <Text style={styles.acc_name}>{detailDish.createdBy.userName}</Text>
             </View>
-            <Text style={styles.desc} numberOfLines={isExpanded ? null : 4}>
+            <Text
+              style={styles.desc}
+              numberOfLines={isExpanded ? null : 4}
+              onTextLayout={(e) => {
+                const lineCount = e.nativeEvent.lines.length
+                if (lineCount > 4) {
+                  setShowSeeMore(true)
+                } else {
+                  setShowSeeMore(false)
+                }
+              }}
+            >
               {detailDish.desc}
             </Text>
-            <TouchableOpacity onPress={() => setIsExpanded(!isExpanded)}>
-              <Text style={styles.seeMoreText}>{isExpanded ? 'Thu gọn' : 'Xem thêm'}</Text>
-            </TouchableOpacity>
+            {showSeeMore && (
+              <TouchableOpacity onPress={() => setIsExpanded(!isExpanded)}>
+                <Text style={styles.seeMoreText}>{isExpanded ? 'Thu gọn' : 'Xem thêm'}</Text>
+              </TouchableOpacity>
+            )}
           </View>
 
           <View style={styles.ingredient_box}>
             <Text style={styles.title}>Nguyên Liệu</Text>
+            <View style={styles.info_time_serving}>
+              <View style={styles.serving_time_box}>
+                <Icon name='user' size={18} color='#728156' />
+                <Text style={styles.serving_time_Number}>{detailDish.servingNumber} người</Text>
+              </View>
+              <View style={styles.serving_time_box}>
+                <Icon name='clock-o' size={20} color='#728156' />
+                <Text style={styles.serving_time_Number}>{detailDish.cookingTime} phút</Text>
+              </View>
+            </View>
             <Ingredients ingredientList={ingredients} />
           </View>
 
           <View style={styles.cookingSteps_box}>
             <Text style={styles.title_Steps}>Các bước nấu ăn</Text>
             <Steps cookingSteps={detailDish.cookingSteps} />
+            <TouchableOpacity style={styles.btn_startCook} onPress={handleStartCooking}>
+              <Text style={styles.btnText}>Bắt đầu nấu ăn!</Text>
+            </TouchableOpacity>
           </View>
 
           <View style={styles.cmt_box}>
@@ -233,7 +264,20 @@ const styles = StyleSheet.create({
     fontWeight: '300',
     marginTop: 5,
   },
-
+  info_time_serving: {
+    marginBottom: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  serving_time_box: {
+    flexDirection: 'row',
+    width: 200,
+    gap: 10,
+    alignItems: 'center',
+  },
+  serving_time_Number: {
+    color: '#728156',
+  },
   info: {
     marginTop: 20,
     padding: 10,
@@ -276,7 +320,7 @@ const styles = StyleSheet.create({
     fontSize: 25,
     fontWeight: 'bold',
     color: '#000',
-    marginBottom: 15,
+    marginBottom: 10,
   },
   btnShowGroceries: {
     backgroundColor: '#FF9320',
@@ -287,8 +331,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   btnText: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 15,
+    fontWeight: 'light',
     color: '#fff',
   },
   btn_box: {
@@ -302,6 +346,13 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
     borderBottomWidth: 1,
     borderColor: '#D9D9D9',
+  },
+  btn_startCook: {
+    paddingHorizontal: 15,
+    paddingVertical: 7,
+    backgroundColor: '#728156',
+    borderRadius: 100,
+    marginTop: 10,
   },
   title_Steps: {
     textTransform: 'uppercase',

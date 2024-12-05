@@ -84,11 +84,11 @@ const styles = StyleSheet.create({
   email: {
     top: 32,
     fontSize: 15,
-    color: '#000',
-    opacity: 0.5,
+    color: '#fff',
     alignItems: 'center',
     left: 84,
     position: 'absolute',
+    fontWeight: 'light',
   },
   backgroung_setting: {
     top: 55,

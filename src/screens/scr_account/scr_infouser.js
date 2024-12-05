@@ -79,7 +79,7 @@ export default function InfoUser() {
     await AsyncStorage.removeItem('token')
     navigation.navigate('LogIn')
   }
-
+  console.log(user)
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.title}>
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
   email: {
     fontSize: 18,
     color: 'black',
-    fontWeight: '500',
+    fontWeight: 'light',
     marginTop: 5,
     alignSelf: 'center',
   },
