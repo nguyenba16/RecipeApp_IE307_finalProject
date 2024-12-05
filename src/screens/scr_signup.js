@@ -31,7 +31,7 @@ export default function SignUpScreen() {
   const handleReEnterPassword = (value) => {
     setReEnterPassword(value)
   }
-
+  console.log(userName, password, phoneNumber, email)
   const handleSignUp = async () => {
     if (!userName || !phoneNumber || !email || !password || !reEnterPassword) {
       alert('Vui lòng điền đầy đủ thông tin!')
@@ -60,7 +60,6 @@ export default function SignUpScreen() {
         phone: phoneNumber,
         password,
         userName,
-        avatar_URL: '',
       })
 
       if (response.status === 201) {

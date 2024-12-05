@@ -20,14 +20,14 @@ export default function GroceriesScreen() {
         }}
       >
         <TabGroceriy.Screen
-          name='Nguyên liệu thiếu'
+          name='UnavailableIngredients'
           component={ListIngreNeed}
-          options={{ tabBarLabel: 'Nguyên liệu thiếu ' }}
+          options={{ tabBarLabel: 'Nguyên liệu còn thiếu' }}
         />
         <TabGroceriy.Screen
-          name='Công thức chia sẻ'
+          name='AvailableIngredients'
           component={ListIngreHaved}
-          options={{ tabBarLabel: 'Nguyên liệu có' }}
+          options={{ tabBarLabel: 'Nguyên liệu đã có' }}
         />
       </TabGroceriy.Navigator>
     </View>

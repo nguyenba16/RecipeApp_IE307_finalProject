@@ -3,13 +3,11 @@ import { useNavigation } from '@react-navigation/native'
 
 const CategroryCard = ({ item }) => {
   const navigation = useNavigation()
+  const handleNavtoSearch = () => {
+    navigation.navigate('Search', { cate: item.name })
+  }
   return (
-    <TouchableOpacity
-      style={styles.card_cate}
-      onPress={() => {
-        navigation.navigate('Search', { categrory: item.name })
-      }}
-    >
+    <TouchableOpacity style={styles.card_cate} onPress={handleNavtoSearch}>
       <Image source={item.img} style={styles.image_cate} />
       <View style={styles.overlay} />
       <Text style={styles.dishName_cate}>{item.name}</Text>

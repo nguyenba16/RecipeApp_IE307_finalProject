@@ -19,7 +19,7 @@ const TraditionalDishCard = ({ item }) => {
       <View style={styles.infoContainer_traditional}>
         <Text style={styles.time_traditional}>{item.cookingTime} min</Text>
         <View style={styles.likebox}>
-          <Text style={styles.likesNumber}>{item.saveUsers.length} </Text>
+          <Text style={styles.likesNumber}>{item.likeUsers.length} </Text>
           <Icon style={styles.likeicon} name='heart' size={15} />
         </View>
       </View>
@@ -42,15 +42,16 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
   },
   dishName_traditional: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    padding: 10,
+    paddingLeft: 20,
+    paddingVertical: 10,
   },
   infoContainer_traditional: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 10,
+    paddingHorizontal: 20,
     paddingBottom: 10,
   },
   time_traditional: {
@@ -61,6 +62,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 4,
     alignItems: 'center',
+  },
+  likesNumber: {
+    fontSize: 15,
   },
 })
 

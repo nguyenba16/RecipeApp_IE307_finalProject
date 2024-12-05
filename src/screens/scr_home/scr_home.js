@@ -1,20 +1,10 @@
 import React, { useState, useEffect, useContext, useRef } from 'react'
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Image,
-  ImageBackground,
-  FlatList,
-  TouchableOpacity,
-} from 'react-native'
+import { View, Text, StyleSheet, ScrollView, ImageBackground, FlatList } from 'react-native'
 import color from '../../../color'
 import OutStandingDishCard from './components/OutStandingDishCard'
 import axios from 'axios'
 import { AuthContext } from '../../components/AuthContext'
 import TraditionalDishCard from './components/TraditionalDishCard'
-import { useNavigation } from '@react-navigation/native'
 import CategroryCard from './components/CategroryCard'
 
 const api = axios.create({
@@ -38,7 +28,6 @@ const categroryDish = [
 
 export default function HomeScreen() {
   const { user } = useContext(AuthContext)
-  const navigation = useNavigation()
   const [currentIndex, setCurrentIndex] = useState(0)
   const [outstandingDishes, setOutstandingDishes] = useState([])
   const [traditionalDish, setTraditionalDish] = useState([])
