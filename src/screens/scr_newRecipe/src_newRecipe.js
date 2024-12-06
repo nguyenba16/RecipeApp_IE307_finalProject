@@ -17,46 +17,12 @@ const api = axios.create({
   baseURL: 'http://192.168.56.1:5000',
 })
 
-const ListIngre = [
-  {
-    key: 1,
-    name: 'Ngữ vị hương',
-    dvi: 'kg',
-    img: require('../../../assets/icons/logo.png'),
-  },
-  {
-    key: 2,
-    name: 'Cá',
-    dvi: 'kg',
-    img: require('../../../assets/icons/logo.png'),
-  },
-  {
-    key: 3,
-    name: 'Rau',
-    dvi: 'kg',
-    img: require('../../../assets/icons/logo.png'),
-  },
-  {
-    key: 4,
-    name: 'Đường',
-    dvi: 'kg',
-    img: require('../../../assets/icons/logo.png'),
-  },
-  {
-    key: 5,
-    name: 'Muối',
-    dvi: 'gam',
-    img: require('../../../assets/icons/logo.png'),
-  },
-]
-
 export default function NewRecipe() {
   const { user } = useContext(AuthContext)
   const naviagtion = useNavigation()
   //Kiểm soát các trường thông tin nhập vào
   const [stateShare, setStateShare] = useState(false)
   useEffect(() => {
-    console.log(photo, nameDish, desc, serving, timecook, cate, ListAddIngre, method)
     if (
       photo != '' &&
       nameDish != '' &&
@@ -99,18 +65,13 @@ export default function NewRecipe() {
     })
     if (!result.canceled) {
       setPhoto(result.assets[0].uri)
-      console.log(photo)
     }
   }
-  const [ingredients, setIngredients] = useState()
+  const [ingredients, setIngredients] = useState([])
   const fetchIngredients = async () => {
     try {
       const response = await api.get('/all-ingredients')
-      if (response.status === 200) {
-        setIngredients(response.data)
-      } else {
-        console.error('Failed to fetch ingredients:', response.data.message)
-      }
+      setIngredients(response.data); 
     } catch (error) {
       console.error('Error fetching ingredients:', error.message)
     }
@@ -135,7 +96,7 @@ export default function NewRecipe() {
 
   //Nhận mảng các nguyên liệu
   const [ingredient, setIngredient] = useState()
-  const pickerItems = ListIngre.map((item) => ({ label: item.name, value: item.key }))
+  const pickerItems = ingredients.map((item) => ({ label: item.IngredientName, value: item._id }))
   //Nhận img của từng nguyên liệu
   const [imgIngre, setImgIngre] = useState()
   //Nhận giá trị của số lượng
@@ -143,10 +104,10 @@ export default function NewRecipe() {
   //Nhận giá trị của đơn vị
   const [dvi, setDvi] = useState('Đơn vị')
   const handleIngredientChange = (value) => {
-    ListIngre.map((item) => {
-      if (value === item.key) {
-        setDvi(item.dvi)
-        setImgIngre(item.img)
+    ingredients.map((item) => {
+      if (value === item._id) {
+        setDvi(item.unit)
+        setImgIngre(item.imgIngredient)
       }
     })
     setIngredient(value)
@@ -156,11 +117,14 @@ export default function NewRecipe() {
   //Thêm nguyên liệu vào danh sách
   const AddIngredient = (value) => {
     if (value != null) {
+      console.log(value)
       const newIngredient = { id: value, quality: quality }
       setListAddIngre([...ListAddIngre, newIngredient]) // Đặt lại các giá trị sau khi thêm
       setIngredient(null)
       setQuality(0)
       setStateIngre(false)
+      setImgIngre(null)
+      setDvi('Đơn vị')
     }
   }
   //Xóa nguyên liệu ra khỏi danh sách
@@ -288,27 +252,20 @@ export default function NewRecipe() {
               placeholder='Số khẩu phần'
               onChangeText={setServing}
             />
-            <Text>người</Text>
+            <Text style={styles.text_unit_serving}>người</Text>
           </View>
         </View>
         {/* Nhập thời gian nấu ăn */}
         <View style={styles.serving}>
           <Text style={styles.text_serving}>Thời gian nấu</Text>
-          <View style={styles.inputtext_serving}>
-            <RNPickerSelect
-              placeholder={{ label: 'Thời gian', value: null }}
-              value={timecook}
-              onValueChange={(value) => setTimecook(value)}
-              items={[
-                { label: '10 phút', value: 10 },
-                { label: '15 phút', value: 15 },
-                { label: '20 phút', value: 20 },
-                { label: '25 phút', value: 25 },
-                { label: '30 phút', value: 30 },
-                { label: '35 phút', value: 35 },
-                { label: '40 phút', value: 40 },
-              ]}
+          <View style={styles.input_serving_box}>
+            <TextInput
+              keyboardType='number-pad'
+              style={styles.input_serving}
+              placeholder='Số thời gian'
+              onChangeText={setTimecook}
             />
+            <Text style={styles.text_unit_serving}>phút</Text>
           </View>
         </View>
         {/* Chọn loại món ăn */}
@@ -332,7 +289,7 @@ export default function NewRecipe() {
         {ListAddIngre.map((ingre, index) => (
           <View key={index}>
             {ingredients.map((item) => {
-              if (ingre.id === item.key) {
+              if (ingre.id === item._id) {
                 return (
                   <View key={item.key}>
                     <ItemIngre
@@ -349,7 +306,7 @@ export default function NewRecipe() {
 
         <View style={styles.ingredient}>
           <View style={styles.background_img_ingre}>
-            <Image style={styles.img_ingre} source={imgIngre} />
+            <Image style={styles.img_ingre} source={{uri: imgIngre}} />
           </View>
           {/* Chọn tên nguyên liệu */}
           <View style={styles.text_name_ingre}>
@@ -529,8 +486,15 @@ const styles = StyleSheet.create({
     marginHorizontal: 15,
   },
   input_serving: {
-    padding: 10,
     backgroundColor: '#F5F5F5',
+    fontSize: 16,
+    textAlign: "center",
+    minWidth: 35,
+  },
+  text_unit_serving:{
+    fontSize: 16,
+    textAlign: "left",
+    width: 45,
   },
   serving: {
     flexDirection: 'row',
@@ -557,6 +521,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 5,
     flexDirection: 'row',
+    paddingHorizontal: 5,    
+    backgroundColor: '#F5F5F5',
+    borderRadius: 5,
+    maxWidth: 170,
   },
   title_ingredient: {
     fontSize: 20,
@@ -588,21 +556,22 @@ const styles = StyleSheet.create({
   img_ingre: {
     height: 30,
     width: 30,
+    borderRadius: 100,
   },
   text_name_ingre: {
-    width: '50%',
+    width: '55%',
     fontSize: 15,
     alignContent: 'center',
     textAlign: 'center',
   },
   text_quality: {
-    width: '20%',
+    width: '10%',
     fontSize: 16,
     textAlign: 'right',
     textAlignVertical: 'center',
   },
   text_dvi: {
-    width: '20%',
+    width: '23%',
     fontSize: 16,
     borderBottomRightRadius: 5,
     borderTopRightRadius: 5,
