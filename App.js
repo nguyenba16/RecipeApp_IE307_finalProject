@@ -11,6 +11,7 @@ import NewRecipe from './src/screens/scr_newRecipe/src_newRecipe'
 import DishDetail from './src/screens/scr_dishDetails/scr_dishDetails'
 import EditInfo from './src/screens/scr_account/scr_edit_info'
 import StepRecipe from './src/screens/scr_stepRecipe/scr_stepRecipe'
+import DetailAccount from './src/screens/detailAccount'
 const Stack = createStackNavigator()
 
 export default function App() {
@@ -30,6 +31,7 @@ export default function App() {
             component={StepRecipe}
             screenOptions={{ headerShown: true }}
           />
+          <Stack.Screen name='DetailAccount' component={DetailAccount} />
         </Stack.Navigator>
       </NavigationContainer>
     </AuthProvider>

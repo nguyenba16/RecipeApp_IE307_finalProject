@@ -19,7 +19,9 @@ const api = axios.create({
 
 export default function NewRecipe() {
   const { user } = useContext(AuthContext)
-  const naviagtion = useNavigation()
+  const navigation = useNavigation()
+  const [isErrorAddIngre, setIsErrorAddIngre] = useState(false)
+  const [isErrorAddStep, setIsErrorAddStep] = useState(false)
   //Kiểm soát các trường thông tin nhập vào
   const [stateShare, setStateShare] = useState(false)
   useEffect(() => {
@@ -27,11 +29,11 @@ export default function NewRecipe() {
       photo != '' &&
       nameDish != '' &&
       desc != '' &&
-      serving != null &&
-      timecook != null &&
-      cate != null &&
-      ListAddIngre.length > 0 &&
-      method.length > 0
+      servingNumber != null &&
+      cookingTime != null &&
+      categroryType != null &&
+      ingredientList.length > 0 &&
+      cookingSteps.length > 0
     ) {
       setStateShare(true)
     } else {
@@ -41,13 +43,12 @@ export default function NewRecipe() {
     { photo },
     { nameDish },
     { desc },
-    { serving },
-    { timecook },
-    { cate },
-    { ListAddIngre },
-    { method },
+    { servingNumber },
+    { cookingTime },
+    { categroryType },
+    { ingredientList },
+    { cookingSteps },
   ])
-
   //Nhận đường dẫn của ảnh món ăn
   const [photo, setPhoto] = useState('')
 
@@ -67,11 +68,12 @@ export default function NewRecipe() {
       setPhoto(result.assets[0].uri)
     }
   }
+
   const [ingredients, setIngredients] = useState([])
   const fetchIngredients = async () => {
     try {
       const response = await api.get('/all-ingredients')
-      setIngredients(response.data); 
+      setIngredients(response.data)
     } catch (error) {
       console.error('Error fetching ingredients:', error.message)
     }
@@ -79,23 +81,14 @@ export default function NewRecipe() {
   useEffect(() => {
     fetchIngredients()
   }, [])
-  //Nhận giá trị của tên món ăn
+
   const [nameDish, setNameDish] = useState('')
-
-  //Nhận giá trị của mô tả
   const [desc, setDesc] = useState('')
-
-  //Nhận giá trị khẩu phần ăn
-  const [serving, setServing] = useState(null)
-
-  //Nhận giá trị thời gian nấu
-  const [timecook, setTimecook] = useState(null)
-
-  //Nhận giá trị loại gian nấu
-  const [cate, setCate] = useState(null)
-
-  //Nhận mảng các nguyên liệu
+  const [servingNumber, setServingNumber] = useState()
+  const [cookingTime, setCookingTime] = useState()
+  const [categroryType, setCategroryType] = useState()
   const [ingredient, setIngredient] = useState()
+
   const pickerItems = ingredients.map((item) => ({ label: item.IngredientName, value: item._id }))
   //Nhận img của từng nguyên liệu
   const [imgIngre, setImgIngre] = useState()
@@ -113,37 +106,44 @@ export default function NewRecipe() {
     setIngredient(value)
   }
   //Danh sách các nguyên liệu đã được thêm
-  const [ListAddIngre, setListAddIngre] = useState([])
+  const [ingredientList, setIngredientList] = useState([])
   //Thêm nguyên liệu vào danh sách
   const AddIngredient = (value) => {
-    if (value != null) {
-      console.log(value)
-      const newIngredient = { id: value, quality: quality }
-      setListAddIngre([...ListAddIngre, newIngredient]) // Đặt lại các giá trị sau khi thêm
-      setIngredient(null)
+    if (isNaN(quality) || !Number.isInteger(quality) || quality > 9 || quality <= 0) {
+      setIsErrorAddIngre(true)
       setQuality(0)
+      return
+    }
+    if (value != null) {
+      const newIngredient = { ingredientID: value, quality: quality }
+      setIsErrorAddIngre(false)
+      setQuality(0)
+      setIngredientList([...ingredientList, newIngredient])
+      setIngredient(null)
       setStateIngre(false)
       setImgIngre(null)
       setDvi('Đơn vị')
     }
   }
+
   //Xóa nguyên liệu ra khỏi danh sách
   const removeIngre = (ingre) => {
-    const newArray = ListAddIngre.filter((element) => element !== ingre)
-    setListAddIngre(newArray)
+    const newArray = ingredientList.filter((element) => element !== ingre)
+    setIngredientList(newArray)
   }
   //Kiểm soát giá trị thêm vào mảng nguyên liệu
   const [stateIngre, setStateIngre] = useState(false)
   useEffect(() => {
     if (ingredient != null && quality != 0) {
+      setIsErrorAddIngre(false)
       setStateIngre(true)
     }
   }, [{ ingredient }, { quality }])
 
   //Nhận giá trị của tiêu đề từng bước
-  const [titleMethod, setTitleMethod] = useState('')
+  const [stepTitle, setStepTitle] = useState('')
   //Nhận đường dẫn của ảnh từng bước thực hiện
-  const [imgMethod, setImgMethod] = useState('')
+  const [img_step, setImgStep] = useState()
   const openImageMethod = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync()
     if (permissionResult.granted === false) {
@@ -157,56 +157,97 @@ export default function NewRecipe() {
       quality: 1,
     })
     if (!result.canceled) {
-      setImgMethod(result.assets[0].uri)
+      setImgStep(result.assets[0].uri)
     }
   }
   //Nhận giá trị mô tả chi tiết cho từng bước
-  const [detailMethod, setDetailMethod] = useState('')
+  const [stepDesc, setStepDesc] = useState('')
   //Danh sách các bước thực hiện
-  const [method, setMethod] = useState([])
+  const [cookingSteps, setCookingSteps] = useState([])
+
   const addMethodStep = () => {
-    if (titleMethod != '' && detailMethod != '') {
-      const newStep = { title: titleMethod, image: imgMethod, detail: detailMethod }
-      setMethod([...method, newStep])
+    if (stepTitle == '' || stepDesc == '' || img_step == null || img_step == undefined) {
+      setIsErrorAddStep(true)
     }
-    // Đặt lại các giá trị sau khi thêm
-    setTitleMethod('')
-    setImgMethod(null)
-    setDetailMethod('')
+    if (stepTitle != '' && stepDesc != '' && img_step != null && img_step != undefined) {
+      setIsErrorAddStep(false)
+      const newStep = { stepTitle: stepTitle, img_step: img_step, step_desc: stepDesc }
+      setCookingSteps([...cookingSteps, newStep])
+    }
+    setStepTitle('')
+    setImgStep(null)
+    setStepDesc('')
     setStaeMethod(false)
   }
   //Kiểm soát giá trị thêm vào ds các bước
   const [stateMethod, setStaeMethod] = useState(false)
   useEffect(() => {
-    if (titleMethod != '' && imgMethod != '' && detailMethod != '') {
-      setStaeMethod(true)
+    if (stepTitle != '' && img_step != null && stepDesc != '') {
+      setIsErrorAddStep(false)
     }
-  }, [{ titleMethod }, { imgMethod }, { detailMethod }])
+  }, [{ stepTitle }, { img_step }, { stepDesc }])
+
+  const handleSubmitRecipe = async () => {
+    try {
+      const formData = new FormData()
+
+      // Thêm ảnh chính của món ăn vào formData
+      if (photo) {
+        formData.append('stepImages', {
+          uri: photo,
+          name: 'photo.jpg',
+          type: 'image/jpeg',
+        })
+      }
+
+      // Thêm thông tin khác
+      formData.append('createdBy', user.id)
+      formData.append('nameDish', nameDish)
+      formData.append('desc', desc)
+      formData.append('servingNumber', servingNumber)
+      formData.append('cookingTime', cookingTime)
+      formData.append('categroryType', categroryType)
+
+      // Thêm danh sách nguyên liệu
+      formData.append('ingredientList', JSON.stringify(ingredientList))
+
+      // Thêm các bước thực hiện
+      formData.append('cookingSteps', JSON.stringify(cookingSteps))
+
+      // Gửi request đến server
+      const response = await api.post('/add', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+
+      if (response.status === 201) {
+        Alert.alert('Thêm công thức thành công', response.data.message)
+      } else {
+        Alert.alert('Thêm công thức thất bại')
+      }
+    } catch (error) {
+      console.error('Lỗi khi gửi dữ liệu:', error.message)
+      Alert.alert('Có lỗi xảy ra, thử lại sau.')
+    }
+  }
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* header */}
       <View style={styles.title}>
-        {/* Back button */}
         <View style={{ flexDirection: 'row' }}>
-          <TouchableOpacity onPress={() => naviagtion.goBack()}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
             <Ionicons name='arrow-back-outline' size={30} color='white' />
           </TouchableOpacity>
-          <Text style={styles.text_create}>Tạo công thức</Text>
+          <Text style={styles.text_create}>Thêm công thức mới</Text>
         </View>
-
-        {/* Share button */}
         <TouchableOpacity
           style={stateShare ? styles.touch_share_true : styles.touch_share_false}
           disabled={!stateShare}
-          onPress={() => Alert.alert('na')}
+          onPress={handleSubmitRecipe}
         >
           <Text style={stateShare ? styles.text_touch_true : styles.text_touch_false}>Chia sẻ</Text>
         </TouchableOpacity>
       </View>
-      {/* Màn hình nhập các thông tin */}
       <ScrollView style={styles.scroll}>
-        {/* Thêm hình ảnh cho món ăn */}
         <TouchableOpacity style={styles.touch_up_img} onPress={openImage}>
           {photo ? (
             <Image
@@ -225,37 +266,41 @@ export default function NewRecipe() {
             </View>
           )}
         </TouchableOpacity>
-        {/* Nhập tên món ăn */}
+
         <TextInput
           style={styles.text_name}
           placeholder='Tên món ăn'
+          placeholderTextColor='#CFCFCF'
           multiline={true}
           value={nameDish}
           onChangeText={setNameDish}
         />
-        {/* Nhập mô tả món ăn */}
+
         <TextInput
           style={styles.text_note}
           keyboardType='default'
-          placeholder='Hãy viết dòng chia sẻ về món ăn của bạn'
+          placeholder='Hãy viết dòng chia sẻ về món ăn của bạn!'
+          placeholderTextColor='#CFCFCF'
           multiline={true}
           value={desc}
           onChangeText={setDesc}
         />
-        {/* Nhập khẩu phần ăn */}
+
         <View style={styles.serving}>
           <Text style={styles.text_serving}>Khẩu phần</Text>
           <View style={styles.input_serving_box}>
             <TextInput
               keyboardType='number-pad'
               style={styles.input_serving}
+              value={servingNumber}
               placeholder='Số khẩu phần'
-              onChangeText={setServing}
+              placeholderTextColor='#CFCFCF'
+              onChangeText={(text) => setServingNumber(Number(text))}
             />
             <Text style={styles.text_unit_serving}>người</Text>
           </View>
         </View>
-        {/* Nhập thời gian nấu ăn */}
+
         <View style={styles.serving}>
           <Text style={styles.text_serving}>Thời gian nấu</Text>
           <View style={styles.input_serving_box}>
@@ -263,19 +308,21 @@ export default function NewRecipe() {
               keyboardType='number-pad'
               style={styles.input_serving}
               placeholder='Số thời gian'
-              onChangeText={setTimecook}
+              placeholderTextColor='#CFCFCF'
+              value={cookingTime}
+              onChangeText={(text) => setCookingTime(Number(text))}
             />
             <Text style={styles.text_unit_serving}>phút</Text>
           </View>
         </View>
-        {/* Chọn loại món ăn */}
+
         <View style={styles.serving}>
           <Text style={styles.text_serving}>Loại món ăn</Text>
           <View style={styles.inputtext_serving}>
             <RNPickerSelect
-              placeholder={{ label: 'Loại món ăn', value: null }}
-              value={cate}
-              onValueChange={(value) => setCate(value)}
+              placeholder={{ label: 'Chọn chủ đề', value: null }}
+              value={categroryType}
+              onValueChange={(value) => setCategroryType(value)}
               items={[
                 { label: 'Miền Bắc', value: 'Miền Bắc' },
                 { label: 'Miền Nam', value: 'Miền Nam' },
@@ -284,14 +331,14 @@ export default function NewRecipe() {
             />
           </View>
         </View>
-        {/* Danh sách các nguyên liệu */}
+
         <Text style={styles.title_ingredient}>Nguyên liệu</Text>
-        {ListAddIngre.map((ingre, index) => (
-          <View key={index}>
+        {ingredientList.map((ingre, index) => (
+          <View>
             {ingredients.map((item) => {
-              if (ingre.id === item._id) {
+              if (ingre.ingredientID === item._id) {
                 return (
-                  <View key={item.key}>
+                  <View>
                     <ItemIngre
                       ingredient={item}
                       quality={ingre.quality}
@@ -305,10 +352,7 @@ export default function NewRecipe() {
         ))}
 
         <View style={styles.ingredient}>
-          <View style={styles.background_img_ingre}>
-            <Image style={styles.img_ingre} source={{uri: imgIngre}} />
-          </View>
-          {/* Chọn tên nguyên liệu */}
+          <Image style={styles.img_ingre} source={{ uri: imgIngre }} />
           <View style={styles.text_name_ingre}>
             <RNPickerSelect
               placeholder={{ label: 'Chọn nguyên liệu', value: null }}
@@ -317,47 +361,43 @@ export default function NewRecipe() {
               items={pickerItems}
             />
           </View>
-          {/* Nhập số lượng nguyên liệu */}
           <TextInput
             keyboardType='number-pad'
             style={styles.text_quality}
             placeholder='0'
             value={quality}
-            onChangeText={setQuality}
+            onChangeText={(text) => setQuality(Number(text))}
           />
-          {/* Đơn vị nguyên liệu */}
           <Text style={styles.text_dvi}>{dvi}</Text>
         </View>
-        <TouchableOpacity
-          style={styles.add_ingre}
-          disabled={!stateIngre}
-          onPress={() => AddIngredient(ingredient)}
-        >
+        {isErrorAddIngre ? (
+          <Text style={styles.err_text}>Vui lòng nhập đúng và đủ các giá trị!</Text>
+        ) : null}
+
+        <TouchableOpacity style={styles.add_ingre} onPress={() => AddIngredient(ingredient)}>
           <Ionicons style={styles.icon_add} name='add-outline' size={25} color='black' />
           <Text style={styles.text_add}>Thêm nguyên liệu</Text>
         </TouchableOpacity>
 
         <Text style={styles.title_ingredient}>Các bước thực hiện</Text>
 
-        <ItemStep method={method} setmethod={setMethod} />
+        <ItemStep cookingSteps={cookingSteps} setCookingSteps={setCookingSteps} />
         <View style={styles.methodcook}>
-          {/* Thứ tự bước thực hiện */}
-          <Text style={styles.method_number}>Bước {method.length + 1} :</Text>
+          <Text style={styles.method_number}>Bước {cookingSteps.length + 1} :</Text>
+
+          <TextInput
+            style={styles.text_title_method}
+            placeholder='Tóm tắt bước thực hiện'
+            placeholderTextColor='#CFCFCF'
+            value={stepTitle}
+            onChangeText={setStepTitle}
+            multiline={true}
+          />
           <View style={styles.title_method}>
-            {/* Nhập title bước thực hiện */}
-            <TextInput
-              style={styles.text_title_method}
-              placeholder='Tóm tắt bước thực hiện'
-              value={titleMethod}
-              onChangeText={setTitleMethod}
-            />
-          </View>
-          <View style={styles.title_method}>
-            {/* Thêm ảnh cho bước thực hiện */}
             <TouchableOpacity style={styles.upload_method} onPress={openImageMethod}>
-              {imgMethod ? (
+              {img_step ? (
                 <Image
-                  source={{ uri: imgMethod }}
+                  source={{ uri: img_step }}
                   style={{ width: '100%', height: '100%', borderRadius: 5 }}
                 />
               ) : (
@@ -371,20 +411,19 @@ export default function NewRecipe() {
                 </View>
               )}
             </TouchableOpacity>
-            {/* Nhập mô tả chi tiết cho bước thực hiện */}
             <TextInput
               style={styles.text_method}
               placeholder='Mô tả chi tiết thực hiện'
-              value={detailMethod}
-              onChangeText={setDetailMethod}
+              value={stepDesc}
+              placeholderTextColor='#CFCFCF'
+              onChangeText={setStepDesc}
+              multiline={true}
             />
           </View>
-
-          <TouchableOpacity
-            onPress={addMethodStep}
-            style={styles.add_method}
-            disabled={!stateMethod}
-          >
+          {isErrorAddStep ? (
+            <Text style={styles.err_text}>Vui lòng nhập đúng và đủ các giá trị!</Text>
+          ) : null}
+          <TouchableOpacity onPress={addMethodStep} style={styles.add_method}>
             <Ionicons style={styles.icon_add} name='add-outline' size={25} color='black' />
             <Text style={styles.text_add}>Thêm bước</Text>
           </TouchableOpacity>
@@ -400,6 +439,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'white',
+    backgroundColor: '#f7f7f7',
   },
   scroll: {
     width: '100%',
@@ -444,6 +484,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     fontSize: 15,
   },
+  err_text: {
+    color: 'red',
+    fontSize: 12,
+    marginTop: 5,
+    marginLeft: 20,
+  },
   text_touch_false: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -459,42 +505,38 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 10,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#ffffff',
   },
   text_upload: {
     textAlign: 'center',
     color: '#CFCFCF',
   },
   text_name: {
-    fontSize: 22,
-    backgroundColor: '#F5F5F5',
+    fontSize: 18,
+    backgroundColor: '#ffffff',
     borderRadius: 10,
-    textAlign: 'center',
+    textAlign: 'l',
     marginVertical: 10,
     padding: 5,
     marginHorizontal: 15,
   },
   text_note: {
-    height: 100,
     fontSize: 15,
     borderRadius: 10,
-    backgroundColor: '#F5F5F5',
-    marginVertical: 10,
-    textAlign: 'center',
+    backgroundColor: '#ffffff',
+    textAlign: 'left',
     padding: 5,
     margin: 10,
-    marginHorizontal: 15,
+    padding: 10,
   },
   input_serving: {
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#ffffff',
     fontSize: 16,
-    textAlign: "center",
     minWidth: 35,
   },
-  text_unit_serving:{
+  text_unit_serving: {
     fontSize: 16,
-    textAlign: "left",
-    width: 45,
+    width: 50,
   },
   serving: {
     flexDirection: 'row',
@@ -507,6 +549,7 @@ const styles = StyleSheet.create({
   text_serving: {
     fontSize: 18,
     color: 'black',
+    fontWeight: 'bold',
   },
   inputtext_serving: {
     fontSize: 13,
@@ -515,16 +558,15 @@ const styles = StyleSheet.create({
     color: 'black',
     borderRadius: 5,
     justifyContent: 'center',
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#ffffff',
   },
   input_serving_box: {
     alignItems: 'center',
     gap: 5,
     flexDirection: 'row',
-    paddingHorizontal: 5,    
-    backgroundColor: '#F5F5F5',
+    paddingHorizontal: 5,
+    backgroundColor: '#ffffff',
     borderRadius: 5,
-    maxWidth: 170,
   },
   title_ingredient: {
     fontSize: 20,
@@ -536,22 +578,13 @@ const styles = StyleSheet.create({
   ingredient: {
     width: '90%',
     marginTop: 15,
-    height: 40,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginHorizontal: 20,
-    backgroundColor: '#F5F5F5',
+    marginHorizontal: 'auto',
+    backgroundColor: '#ffffff',
     borderRadius: 5,
-  },
-  background_img_ingre: {
-    width: '10%',
-    height: 40,
-    justifyContent: 'center',
-    paddingLeft: 10,
-    backgroundColor: '#F5F5F5',
-    textAlignVertical: 'center',
-    borderRadius: 5,
+    paddingHorizontal: 10,
   },
   img_ingre: {
     height: 30,
@@ -565,19 +598,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   text_quality: {
-    width: '10%',
+    paddingHorizontal: 5,
     fontSize: 16,
-    textAlign: 'right',
-    textAlignVertical: 'center',
+    width: 70,
   },
   text_dvi: {
-    width: '23%',
     fontSize: 16,
-    borderBottomRightRadius: 5,
-    borderTopRightRadius: 5,
-    paddingLeft: 5,
-    height: 60,
-    textAlignVertical: 'center',
+    padding: 5,
   },
   add_ingre: {
     flexDirection: 'row',
@@ -601,7 +628,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     width: '100%',
     justifyContent: 'space-between',
-    height: 40,
     fontSize: 15,
     marginTop: 5,
   },
@@ -619,7 +645,7 @@ const styles = StyleSheet.create({
     width: '100%',
     fontSize: 15,
     borderRadius: 5,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#ffffff',
   },
   upload_method: {
     width: '30%',
@@ -629,19 +655,19 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderWidth: 1,
     borderColor: '#CFCFCF',
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#fff',
   },
   text_method: {
     width: '68%',
-    height: 100,
+    maxHeight: 100,
     fontSize: 15,
     borderRadius: 5,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#fff',
     textAlignVertical: 'top',
-    textAlign: 'center',
+    padding: 10,
   },
   add_method: {
-    marginTop: 70,
+    marginTop: 10,
     marginBottom: 30,
     flexDirection: 'row',
   },

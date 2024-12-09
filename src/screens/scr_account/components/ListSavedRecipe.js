@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, View, Text } from 'react-native'
 import ItemRecipe from '../../../components/ItemRecipe'
 import { ScrollView } from 'react-native'
 import { useState, useContext, useEffect } from 'react'
@@ -13,7 +13,7 @@ const api = axios.create({
 
 export default function ListSavedRecipe() {
   const { user } = useContext(AuthContext)
-  const [hasRecipes, setHasRecipes] = useState(true)
+  const [hasRecipes, setHasRecipes] = useState(false)
   const [savedRecipes, setSavedRecipes] = useState([])
 
   const fetchSavedRecipes = async () => {
@@ -34,13 +34,13 @@ export default function ListSavedRecipe() {
   useFocusEffect(
     React.useCallback(() => {
       fetchSavedRecipes()
-    }, []),
+    }, [savedRecipes]),
   )
   return (
     <View style={styles.container}>
       {!hasRecipes ? (
         <View>
-          <Text style={styles.text_err}>Bạn chưa có công thức nào nào!</Text>
+          <Text style={styles.text_err}>Bạn chưa có công thức nào!</Text>
         </View>
       ) : (
         <ScrollView>

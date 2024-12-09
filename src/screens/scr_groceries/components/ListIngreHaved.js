@@ -30,7 +30,6 @@ export default function ListIngreHaved() {
       fetchUserDetail()
     }, []),
   )
-  console.log(availableIngredients)
   return (
     <View style={styles.container}>
       {availableIngredients.length === 0 ? (
@@ -38,7 +37,12 @@ export default function ListIngreHaved() {
       ) : (
         <ScrollView>
           {availableIngredients.map((ingredient, index) => (
-            <ItemHaved key={index} ingredient={ingredient} onUpdate={fetchUserDetail} />
+            <ItemHaved
+              key={index}
+              id={ingredient._id}
+              ingredient={ingredient}
+              onUpdate={fetchUserDetail}
+            />
           ))}
         </ScrollView>
       )}

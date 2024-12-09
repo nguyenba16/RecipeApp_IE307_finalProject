@@ -2,7 +2,6 @@ import express from 'express'
 import connect from './DB_connect/connect_DB.js'
 import User from './model/user.js'
 import Recipe from './model/recipe.js'
-import Groceries from './model/groceries.js'
 import Ingredient from './model/ingredient.js'
 import Comment from './model/comment.js'
 import cors from 'cors'
@@ -23,6 +22,14 @@ app.use(bodyParser.json())
 const uri =
   'mongodb+srv://banguyen:banguyen164@cluster0.58q4j.mongodb.net/DB_IE307?retryWrites=true&w=majority&appName=Cluster0'
 connect(uri)
+
+const storage = new CloudinaryStorage({
+  cloudinary: Cloudinary,
+  params: {
+    folder: 'IE307_FinalProject', // Thư mục trên Cloudinary
+  },
+})
+const upload = multer({ storage })
 
 //  get all users
 app.get('/users', async (req, res) => {
@@ -151,45 +158,137 @@ app.post('/signup', async (req, res) => {
 })
 
 // post recipe/ add a recipe -> xem lại vì có bổ sung thêm 1 số trường trong DB như categroryType
-// app.post('/add-recipe', async (req, res) => {
-//   try {
-//     const {
-//       nameDish,
-//       imgURL,
-//       cookingTime,
-//       servingNumber,
-//       desc,
-//       ingredientList,
-//       cookingSteps,
-//       createdBy,
-//     } = req.body
-//     if (!nameDish || !imgURL || !desc || !ingredientList || !cookingSteps || !createdBy) {
-//       return res.status(400).json({ message: 'Điền hết các thông tin trong form' })
+app.post('/add', upload.array('stepImages'), async (req, res) => {
+  try {
+    const {
+      nameDish,
+      likeUsers,
+      saveUsers,
+      cookingTime,
+      servingNumber,
+      desc,
+      categroryType,
+      createdBy,
+      ingredientList,
+      cookingSteps,
+    } = req.body
+
+    const imgURL = req.files?.[0]?.path // Upload ảnh chính lên Cloudinary
+    const uploadedSteps = req.files // Ảnh upload từ cookingSteps
+
+    if (!imgURL) {
+      return res.status(400).json({ message: 'Ảnh chính của món ăn không được cung cấp.' })
+    }
+
+    // Upload từng ảnh trong `cookingSteps` lên Cloudinary
+    const parsedCookingSteps = JSON.parse(cookingSteps)
+    const finalCookingSteps = parsedCookingSteps.map((step, index) => ({
+      img_step: uploadedSteps[index]?.path || step.img_step,
+      stepTitle: step.stepTitle,
+      step_desc: step.step_desc,
+    }))
+
+    const newRecipe = new Recipe({
+      nameDish,
+      imgURL,
+      likeUsers: likeUsers ? JSON.parse(likeUsers) : [],
+      saveUsers: saveUsers ? JSON.parse(saveUsers) : [],
+      cookingTime,
+      servingNumber,
+      desc,
+      categroryType,
+      createdBy,
+      ingredientList: ingredientList ? JSON.parse(ingredientList) : [],
+      cookingSteps: finalCookingSteps,
+    })
+
+    const savedRecipe = await newRecipe.save()
+
+    return res.status(201).json({
+      message: 'Thêm công thức mới thành công!',
+      data: savedRecipe,
+    })
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({ message: 'Có lỗi xảy ra!', error })
+  }
+})
+// .post(
+//   '/add-recipe',
+//   upload.fields([
+//     { name: 'imgURL', maxCount: 1 }, // Ảnh chính của món ăn
+//     { name: 'img_step', maxCount: 10 }, // Ảnh cho các bước nấu
+//   ]),
+//   async (req, res) => {
+//     try {
+//       const {
+//         nameDish,
+//         cookingTime,
+//         servingNumber,
+//         desc,
+//         createdBy,
+//         categroryType,
+//         ingredientList,
+//       } = req.body
+//       // Kiểm tra dữ liệu bắt buộc
+//       if (!nameDish || !desc || !ingredientList || !req.files.imgURL || !createdBy) {
+//         return res.status(400).json({ message: 'Điền đầy đủ thông tin cần thiết!' })
+//       }
+
+//       // Lấy URL ảnh chính từ Cloudinary
+//       const imgURL = req.files.imgURL[0].path
+
+//       console.log('namedish:', nameDish)
+//       console.log('cookingtime: ', cookingTime)
+//       console.log('imgURL: ', imgURL)
+//       console.log('categroryType: ', categroryType)
+//       // Parse ingredientList từ JSON
+//       const parsedIngredientList = JSON.parse(ingredientList)
+//       console.log(parsedIngredientList)
+//       // Parse cookingSteps từ body và xử lý ảnh
+//       const cookingSteps = JSON.parse(req.body.cookingSteps || '[]').map((step, index) => {
+//         const img_step = req.files.img_step[index].path || null
+//         return {
+//           stepTitle: step.stepTitle,
+//           step_desc: step.step_desc,
+//           img_step: img_step,
+//         }
+//       })
+//       console.log('âfasdfs: ', cookingSteps)
+//       // Tạo công thức mới
+//       const newRecipe = new Recipe({
+//         nameDish,
+//         imgURL,
+//         cookingTime,
+//         servingNumber,
+//         desc,
+//         ingredientList: parsedIngredientList,
+//         cookingSteps,
+//         categroryType,
+//         createdBy: mongoose.Types.ObjectId(createdBy),
+//         likeUsers: [],
+//         saveUsers: [],
+//       })
+//       // Lưu vào MongoDB
+//       const savedRecipe = await newRecipe.save()
+
+//       console.log('Đã thêm công thức mới:', savedRecipe)
+
+//       // Phản hồi thành công
+//       res.status(201).json({
+//         message: 'Thêm công thức mới thành công!',
+//         recipe: savedRecipe,
+//       })
+//     } catch (error) {
+//       console.error('Lỗi khi thêm công thức:', error)
+//       res.status(500).json({ message: 'Lỗi server!' })
 //     }
-//     const newRecipe = new Recipe({
-//       nameDish,
-//       imgURL,
-//       likeNumber: 0,
-//       saveNumber: 0,
-//       cookingTime,
-//       servingNumber,
-//       desc,
-//       ingredientList,
-//       cookingSteps,
-//       createdBy: mongoose.Types.ObjectId(createdBy),
-//     })
-//     const savedRecipe = await newRecipe.save()
-//     console.log('Đã thêm thành công công thức này: ', savedRecipe)
-//     res.status(201).json({ message: 'Đã thêm thành công công thức mới!', recipe: savedRecipe })
-//   } catch (error) {
-//     console.error('Error adding recipe:', error)
-//     res.status(500).json({ message: 'Internal server error' })
-//   }
-// })
+//   },
+// )
 
 // Xóa recipe bằng id
 
-app.delete('/my-recipes/:id', authMiddleware, async (req, res) => {
+app.delete('/delete-my-recipes/:id', async (req, res) => {
   const recipeId = req.params.id
   try {
     const deletedRecipe = await Recipe.findByIdAndDelete(recipeId)
@@ -306,36 +405,6 @@ app.get('/traditional-dishes', async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error', error })
   }
 })
-
-// lấy thông tin nguyên liệu bằng id
-// app.get('/ingredient/:id', async (req, res) => {
-//   const idIngredient = req.params.id;
-//   try {
-//     const ingredient = await Ingredient.findById(idIngredient);
-//     if (!ingredient) {
-//       return res.status(404).json({ message: 'Ingredient not found' });
-//     }
-//     res.status(200).json(ingredient);
-//   } catch (error) {
-//     console.error('Error showing Ingredient:', error.message);
-//     res.status(500).json({ message: 'Server error', error: error.message });
-//   }
-// });
-
-// lấy tất cả các comment có recipeID hợp lệ
-// app.get('/comments', async (req, res) => {
-//   const { recipeID } = req.query;
-//   try {
-//     const comments = await Comment.find({ recipeID });
-//     if (!comments) {
-//       return res.status(404).json({ message: 'No comments found for this recipe' });
-//     }
-//     res.status(200).json(comments);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: 'Server error' });
-//   }
-// });
 
 // Thêm 1 comment
 app.post('/add-comment', async (req, res) => {
@@ -571,13 +640,6 @@ app.get('/all-ingredients', async (req, res) => {
   }
 })
 
-const storage = new CloudinaryStorage({
-  cloudinary: Cloudinary,
-  params: {
-    folder: 'IE307_FinalProject', // Thư mục trên Cloudinary
-  },
-})
-const upload = multer({ storage })
 // API để sửa thông tin người dùng
 app.patch('/update-profile', upload.single('avatar_URL'), async (req, res) => {
   try {
@@ -605,6 +667,6 @@ app.patch('/update-profile', upload.single('avatar_URL'), async (req, res) => {
 })
 
 const PORT = 5000
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running at http://192.168.56.1:${PORT}`)
 })

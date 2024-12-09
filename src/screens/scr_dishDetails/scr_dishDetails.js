@@ -101,11 +101,16 @@ export default function DishDetail({ route }) {
       </View>
     )
   }
-
   const handleStartCooking = () => {
     navigation.navigate('StepRecipe', { recipeSteps: detailDish.cookingSteps })
   }
-  console.log(detailDish)
+  const handleNavtoDetailAcc = () => {
+    if (detailDish.createdBy._id != userId) {
+      navigation.navigate('DetailAccount', { userID: detailDish.createdBy._id })
+    } else {
+      navigation.navigate('InfoUser')
+    }
+  }
   return (
     <View style={styles.container}>
       <ScrollView>
@@ -134,10 +139,10 @@ export default function DishDetail({ route }) {
           </View>
 
           <View style={styles.info}>
-            <View style={styles.info_acc}>
+            <TouchableOpacity onPress={handleNavtoDetailAcc} style={styles.info_acc}>
               <Image style={styles.acc_ava} source={{ uri: detailDish.createdBy.avatar_URL }} />
               <Text style={styles.acc_name}>{detailDish.createdBy.userName}</Text>
-            </View>
+            </TouchableOpacity>
             <Text
               style={styles.desc}
               numberOfLines={isExpanded ? null : 4}

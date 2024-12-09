@@ -6,7 +6,7 @@ export default function ItemIngre({ ingredient, quality, remove }) {
   return (
     <View style={styles.container}>
       <View style={styles.ingredient_info}>
-        <Image source={{uri: ingredient.imgIngredient}} style={styles.imgIngredient}></Image>
+        <Image source={{ uri: ingredient.imgIngredient }} style={styles.imgIngredient}></Image>
         <View style={styles.ingredient_name_box}>
           <Text style={styles.text}>{ingredient.IngredientName}</Text>
         </View>

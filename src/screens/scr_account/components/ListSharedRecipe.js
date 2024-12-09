@@ -12,7 +12,7 @@ const api = axios.create({
 
 export default function ListSharedRecipe() {
   const { user } = useContext(AuthContext)
-  const [hasRecipes, setHasRecipes] = useState(true)
+  const [hasRecipes, setHasRecipes] = useState(false)
   const [myRecipes, setMyRecipes] = useState([])
 
   const fetchMyRecipes = async () => {
@@ -32,13 +32,13 @@ export default function ListSharedRecipe() {
   useFocusEffect(
     React.useCallback(() => {
       fetchMyRecipes()
-    }, []),
+    }, [myRecipes]),
   )
   return (
     <View style={styles.container}>
       {!hasRecipes ? (
         <View>
-          <Text style={styles.text_err}>Bạn chưa có công thức nào nào!</Text>
+          <Text style={styles.text_err}>Bạn chưa có công thức nào!</Text>
         </View>
       ) : (
         <ScrollView>
@@ -60,5 +60,6 @@ const styles = StyleSheet.create({
   text_err: {
     fontSize: 15,
     textAlign: 'center',
+    marginTop: 100,
   },
 })

@@ -8,7 +8,7 @@ const api = axios.create({
   baseURL: 'http://192.168.56.1:5000',
 })
 
-export default function ItemNeed({ ingredient, onUpdate }) {
+export default function ItemNeed({ id, ingredient, onUpdate }) {
   const { user } = useContext(AuthContext)
   const handleAddIngredientstoAva = async () => {
     try {
