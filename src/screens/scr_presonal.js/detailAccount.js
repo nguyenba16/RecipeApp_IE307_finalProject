@@ -1,14 +1,12 @@
-import React, { useState, useContext, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useNavigation, useFocusEffect } from '@react-navigation/native'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { ScrollView } from 'react-native-gesture-handler'
 import axios from 'axios'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { AuthContext } from '../components/AuthContext'
-import MyItemRecipe from './scr_account/components/myrecipeItem'
-
+import MyItemRecipe from '../scr_account/components/myrecipeItem'
+import PersonalRecipe from './components/pesonalRecipe'
 const api = axios.create({
   baseURL: 'http://192.168.56.1:5000',
 })
@@ -21,7 +19,7 @@ export default function DetailAccount({ route }) {
   const [shared, setShare] = useState()
   const [liked, setLiked] = useState()
   const [detailUser, setDetailUser] = useState({})
-  console.log(userID)
+
   const fetchUserDetail = async () => {
     try {
       const response = await api.get(`/users/${userID}`)
@@ -66,11 +64,12 @@ export default function DetailAccount({ route }) {
     React.useCallback(() => {
       fetchUserDetail()
       fetchMyRecipes()
-    }, [userID]),
+    }, []),
   )
   useEffect(() => {
     getNumbers()
   }, [myRecipes])
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.title}>
@@ -100,9 +99,9 @@ export default function DetailAccount({ route }) {
             <Text style={styles.text_err}>Bạn chưa có công thức nào nào!</Text>
           </View>
         ) : (
-          <View>
+          <View style={styles.personalRecipes}>
             {myRecipes.map((recipe, index) => (
-              <MyItemRecipe key={index} Recipe={recipe} />
+              <PersonalRecipe key={index} dish={recipe} />
             ))}
           </View>
         )}
@@ -246,5 +245,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '500',
     color: '#FF9320',
+  },
+  personalRecipes: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
   },
 })

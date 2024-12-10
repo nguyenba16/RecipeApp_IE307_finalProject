@@ -340,9 +340,6 @@ app.get('/saved-recipes/:userId', async (req, res) => {
       'createdBy',
       'userName avatar_URL',
     )
-    if (!savedRecipes.length) {
-      return res.status(404).json({ message: 'No saved recipes found' })
-    }
     res.status(200).json(savedRecipes)
   } catch (error) {
     console.error('Error fetching saved recipes:', error)

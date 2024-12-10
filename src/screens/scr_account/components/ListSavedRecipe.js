@@ -18,9 +18,10 @@ export default function ListSavedRecipe() {
 
   const fetchSavedRecipes = async () => {
     const userID = user.id
+
     try {
       const recipes = await api.get(`/saved-recipes/${userID}`)
-      if (recipes) {
+      if (recipes.data.length > 0) {
         setHasRecipes(true)
         setSavedRecipes(recipes.data)
       } else {
@@ -34,7 +35,7 @@ export default function ListSavedRecipe() {
   useFocusEffect(
     React.useCallback(() => {
       fetchSavedRecipes()
-    }, [savedRecipes]),
+    }, []),
   )
   return (
     <View style={styles.container}>

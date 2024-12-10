@@ -50,14 +50,10 @@ export default function InfoUser() {
         console.error('No user ID found')
         return
       }
-      const response = await api.get(`/my-recipes/${userID}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      if (response && response.data) {
+      const recipes = await api.get(`/my-recipes/${userID}`)
+      if (recipes.data.length > 0) {
         setHasRecipes(true)
-        setMyRecipes(response.data)
+        setMyRecipes(recipes.data)
       } else {
         setHasRecipes(false)
       }
@@ -117,7 +113,7 @@ export default function InfoUser() {
         </View>
         {!hasRecipes ? (
           <View style={styles.err_box}>
-            <Text style={styles.text_err}>Bạn chưa có công thức nào nào!</Text>
+            <Text style={styles.text_err}>Bạn chưa có công thức nào!</Text>
           </View>
         ) : (
           <View>
@@ -158,7 +154,7 @@ const styles = StyleSheet.create({
   },
   err_box: {
     justifyContent: 'center',
-    height: '50%',
+    height: '90%',
   },
   text_title: {
     flex: 1,

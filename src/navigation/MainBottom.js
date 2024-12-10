@@ -27,19 +27,20 @@ export default function MainBottom() {
             else if (route.name === 'Search') iconName = focused ? 'search' : 'search-outline'
             else if (route.name === 'Groceries') iconName = focused ? 'cart' : 'cart-outline'
             else if (route.name === 'Profile') iconName = focused ? 'person' : 'person-outline'
-            return <Ionicons name={iconName} size={25} color={iconColor} />
+            return <Ionicons name={iconName} size={28} color={iconColor} />
           },
-          tabBarLabel: ({ focused }) => (
-            <Text
-              style={{ fontSize: 13, fontWeight: 'bold', color: focused ? '#FF9320' : 'black' }}
-            >
-              {route.name}
-            </Text>
-          ),
+          // tabBarLabel: ({ focused }) => (
+          //   <Text
+          //     style={{ fontSize: 13, fontWeight: 'bold', color: focused ? '#FF9320' : 'black' }}
+          //   >
+          //     {route.name}
+          //   </Text>
+          // ),
+          tabBarShowLabel: false,
           tabBarStyle: {
             backgroundColor: '#F5F5F5',
-            height: 100,
-            paddingBottom: 30,
+            height: 70,
+            paddingBottom: 20,
             paddingTop: 10,
             borderTopLeftRadius: 10,
             borderTopRightRadius: 10,
@@ -83,7 +84,7 @@ export default function MainBottom() {
 const styles = StyleSheet.create({
   addButtonContainer: {
     position: 'absolute',
-    bottom: 60,
+    bottom: 30,
     left: '50%',
     marginLeft: -35,
     zIndex: 1,

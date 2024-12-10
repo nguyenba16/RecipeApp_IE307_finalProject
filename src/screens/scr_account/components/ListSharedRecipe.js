@@ -19,7 +19,7 @@ export default function ListSharedRecipe() {
     const userID = user.id
     try {
       const recipes = await api.get(`/my-recipes/${userID}`)
-      if (recipes) {
+      if (recipes.data.length > 0) {
         setHasRecipes(true)
         setMyRecipes(recipes.data)
       } else {
@@ -29,10 +29,11 @@ export default function ListSharedRecipe() {
       console.error('Error: ', error)
     }
   }
+
   useFocusEffect(
     React.useCallback(() => {
       fetchMyRecipes()
-    }, [myRecipes]),
+    }, []),
   )
   return (
     <View style={styles.container}>
@@ -60,6 +61,5 @@ const styles = StyleSheet.create({
   text_err: {
     fontSize: 15,
     textAlign: 'center',
-    marginTop: 100,
   },
 })

@@ -19,7 +19,6 @@ export default function ItemNeed({ id, ingredient, onUpdate }) {
         ingredientID: ingredient.ingredientID._id,
       }
       const response = await api.post('/remove-available-ingredient', req)
-      console.log(response)
       if (response.status === 200) {
         onUpdate()
       }

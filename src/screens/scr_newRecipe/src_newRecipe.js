@@ -107,18 +107,26 @@ export default function NewRecipe() {
   }
   //Danh sách các nguyên liệu đã được thêm
   const [ingredientList, setIngredientList] = useState([])
+  const [hadIngredient, setHadIngredient] = useState(false)
   //Thêm nguyên liệu vào danh sách
   const AddIngredient = (value) => {
-    if (isNaN(quality) || !Number.isInteger(quality) || quality > 9 || quality <= 0) {
+    if (isNaN(quality) || !Number.isInteger(quality) || quality <= 0) {
+      setHadIngredient(false)
       setIsErrorAddIngre(true)
       setQuality(0)
+      return
+    }
+    const ingredientExists = ingredientList.some((ingredient) => ingredient.ingredientID === value)
+    if (ingredientExists) {
+      setHadIngredient(true)
       return
     }
     if (value != null) {
       const newIngredient = { ingredientID: value, quality: quality }
       setIsErrorAddIngre(false)
-      setQuality(0)
+      setHadIngredient(false)
       setIngredientList([...ingredientList, newIngredient])
+      setQuality(0)
       setIngredient(null)
       setStateIngre(false)
       setImgIngre(null)
@@ -190,8 +198,6 @@ export default function NewRecipe() {
   const handleSubmitRecipe = async () => {
     try {
       const formData = new FormData()
-
-      // Thêm ảnh chính của món ăn vào formData
       if (photo) {
         formData.append('stepImages', {
           uri: photo,
@@ -199,28 +205,20 @@ export default function NewRecipe() {
           type: 'image/jpeg',
         })
       }
-
-      // Thêm thông tin khác
       formData.append('createdBy', user.id)
       formData.append('nameDish', nameDish)
       formData.append('desc', desc)
       formData.append('servingNumber', servingNumber)
       formData.append('cookingTime', cookingTime)
       formData.append('categroryType', categroryType)
-
-      // Thêm danh sách nguyên liệu
       formData.append('ingredientList', JSON.stringify(ingredientList))
-
-      // Thêm các bước thực hiện
       formData.append('cookingSteps', JSON.stringify(cookingSteps))
-
-      // Gửi request đến server
       const response = await api.post('/add', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
-
       if (response.status === 201) {
         Alert.alert('Thêm công thức thành công', response.data.message)
+        navigation.goBack()
       } else {
         Alert.alert('Thêm công thức thất bại')
       }
@@ -365,7 +363,7 @@ export default function NewRecipe() {
             keyboardType='number-pad'
             style={styles.text_quality}
             placeholder='0'
-            value={quality}
+            value={quality.toString()}
             onChangeText={(text) => setQuality(Number(text))}
           />
           <Text style={styles.text_dvi}>{dvi}</Text>
@@ -373,6 +371,7 @@ export default function NewRecipe() {
         {isErrorAddIngre ? (
           <Text style={styles.err_text}>Vui lòng nhập đúng và đủ các giá trị!</Text>
         ) : null}
+        {hadIngredient ? <Text style={styles.err_text}>Nguyên liệu đã tồn tại!</Text> : null}
 
         <TouchableOpacity style={styles.add_ingre} onPress={() => AddIngredient(ingredient)}>
           <Ionicons style={styles.icon_add} name='add-outline' size={25} color='black' />

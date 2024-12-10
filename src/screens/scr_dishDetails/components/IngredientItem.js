@@ -1,8 +1,7 @@
-import React from 'react'
+import React, { useState, useContext } from 'react'
 import { View, StyleSheet, Text, TouchableOpacity, Image } from 'react-native'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import axios from 'axios'
-import { useContext } from 'react'
 import { AuthContext } from '../../../components/AuthContext'
 
 const api = axios.create({
@@ -11,6 +10,10 @@ const api = axios.create({
 
 export default function IngredientItem({ Ingredient }) {
   const { user } = useContext(AuthContext)
+
+  // State để hiển thị biểu tượng check xanh
+  const [showCheck, setShowCheck] = useState(false)
+
   const handleAddIngredientstoUnava = async () => {
     try {
       const req = {
@@ -19,14 +22,26 @@ export default function IngredientItem({ Ingredient }) {
         quality: Ingredient.quality,
       }
       const response = await api.post('/add-unavailable-ingredient', req)
+      setShowCheck(true)
+      setTimeout(() => {
+        setShowCheck(false)
+      }, 500)
     } catch (error) {
       console.error('Error: ', error.response ? error.response.data : error.message)
     }
   }
+
   return (
     <View>
       <View style={styles.ingredient_info}>
-        <Image source={{ uri: Ingredient.imgIngredient }} style={styles.imgIngredient}></Image>
+        <View style={styles.img_box}>
+          <Image source={{ uri: Ingredient.imgIngredient }} style={styles.imgIngredient}></Image>
+          {showCheck ? (
+            <View style={styles.successCheckContainer}>
+              <Ionicons name='checkmark-circle' size={30} color='green' />
+            </View>
+          ) : null}
+        </View>
         <View style={styles.ingredient_name_box}>
           <Text style={styles.text}>{Ingredient.IngredientName}</Text>
         </View>
@@ -81,5 +96,11 @@ const styles = StyleSheet.create({
     borderRadius: 1000,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  successCheckContainer: {
+    transform: [{ translateX: -15 }],
+    zIndex: 10,
+    position: 'absolute',
+    left: 17,
   },
 })
