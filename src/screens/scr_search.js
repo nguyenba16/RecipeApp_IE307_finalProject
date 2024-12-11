@@ -1,4 +1,12 @@
-import { View, StyleSheet, Image, Text, TextInput, TouchableOpacity } from 'react-native'
+import {
+  View,
+  StyleSheet,
+  Image,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import ItemRecipe from '../components/ItemRecipe'
 import { useEffect, useState } from 'react'
@@ -14,9 +22,11 @@ export default function SearchScreen({ route }) {
   const [category, setCategrory] = useState(cate || '')
   const [recipes, setRecipes] = useState([])
   const [hasResult, setHasResult] = useState(true)
+  const [isLoading, setIsLoading] = useState(true)
 
   const fetchRecipes = async () => {
     try {
+      setIsLoading(true)
       const requestData = {
         nameDish: searchValue,
         category: category,
@@ -26,7 +36,8 @@ export default function SearchScreen({ route }) {
       setHasResult(true)
     } catch (error) {
       if (searchValue) setHasResult(false)
-      console.error('Không tìm thấy món ăn phù hợp')
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -46,7 +57,14 @@ export default function SearchScreen({ route }) {
     setCategrory('')
     fetchRecipes()
   }
-
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size='large' color='#FF9320' />
+        <Text style={styles.load_text}>Đang tải dữ liệu...</Text>
+      </View>
+    )
+  }
   return (
     <View style={styles.container}>
       <View style={styles.backgroundTitle}>
@@ -80,6 +98,15 @@ export default function SearchScreen({ route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100%',
+    width: '100%',
+  },
+  load_text: {
+    textAlign: 'center',
   },
   backgroundTitle: {
     backgroundColor: '#ff9320',

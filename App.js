@@ -12,13 +12,15 @@ import DishDetail from './src/screens/scr_dishDetails/scr_dishDetails'
 import EditInfo from './src/screens/scr_account/scr_edit_info'
 import StepRecipe from './src/screens/scr_stepRecipe/scr_stepRecipe'
 import DetailAccount from './src/screens/scr_presonal.js/detailAccount'
+
 const Stack = createStackNavigator()
 
 export default function App() {
   return (
     <AuthProvider>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName='LogIn' screenOptions={{ headerShown: false }}>
+        <Stack.Navigator initialRouteName='IntroScreen' screenOptions={{ headerShown: false }}>
+          <Stack.Screen name='IntroScreen' component={IntroScreen} />
           <Stack.Screen name='LogIn' component={LoginScreen} />
           <Stack.Screen name='SignUp' component={SignUpScreen} />
           <Stack.Screen name='MainBottom' component={MainBottom} />

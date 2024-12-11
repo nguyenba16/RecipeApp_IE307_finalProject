@@ -26,6 +26,7 @@ export default function DishDetail({ route }) {
   const { dishID } = route.params
   const { user } = useContext(AuthContext)
   const navigation = useNavigation()
+  const [isLoading, setIsLoading] = useState(true)
 
   const [isLike, setIsLike] = useState(false)
   const [isSave, setIsSave] = useState(false)
@@ -35,12 +36,12 @@ export default function DishDetail({ route }) {
   const [ingredients, setIngredients] = useState([])
   const [commentList, setCommentList] = useState([])
   const [detailDish, setDetailDish] = useState({})
-  const [isLoading, setIsLoading] = useState(true)
 
   const userId = user.id
 
   const fetchDetailDish = async () => {
     try {
+      setIsLoading(true)
       const response = await api.get(`/detailpage/${dishID}`)
       const { recipe, comments, ingredients } = response.data
       setDetailDish(recipe)
@@ -97,7 +98,7 @@ export default function DishDetail({ route }) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size='large' color='#FF9320' />
-        <Text>Đang tải dữ liệu...</Text>
+        <Text style={styles.load_text}>Đang tải dữ liệu...</Text>
       </View>
     )
   }
@@ -385,5 +386,10 @@ const styles = StyleSheet.create({
   loadingContainer: {
     justifyContent: 'center',
     alignItems: 'center',
+    height: '100%',
+    width: '100%',
+  },
+  load_text: {
+    textAlign: 'center',
   },
 })

@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator } from 'react-native'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useNavigation } from '@react-navigation/native'
@@ -20,6 +20,7 @@ export default function InfoUser() {
   const { user } = useContext(AuthContext)
   const [hasRecipes, setHasRecipes] = useState(true)
   const [myRecipes, setMyRecipes] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
   const [shared, setShare] = useState(0)
   const [saved, setSaved] = useState(0)
   const [liked, setLiked] = useState(0)
@@ -40,6 +41,7 @@ export default function InfoUser() {
 
   const fetchMyRecipes = async () => {
     try {
+      setIsLoading(true)
       const token = await AsyncStorage.getItem('token')
       if (!token) {
         console.error('No token found')
@@ -59,6 +61,8 @@ export default function InfoUser() {
       }
     } catch (error) {
       console.error('Error fetching my recipes:', error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -74,6 +78,14 @@ export default function InfoUser() {
   const handleLogout = async () => {
     await AsyncStorage.removeItem('token')
     navigation.navigate('LogIn')
+  }
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size='large' color='#FF9320' />
+        <Text style={styles.load_text}>Đang tải dữ liệu...</Text>
+      </View>
+    )
   }
   return (
     <SafeAreaView style={styles.container}>
@@ -257,5 +269,14 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '500',
     color: '#FF9320',
+  },
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100%',
+    width: '100%',
+  },
+  load_text: {
+    textAlign: 'center',
   },
 })
