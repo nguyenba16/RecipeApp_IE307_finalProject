@@ -64,8 +64,15 @@ export default function LoginScreen() {
           <Text style={styles.heading_title}>Đăng nhập ngay</Text>
           <Text style={styles.desc}>Món ngon mỗi ngày</Text>
         </View>
-        <Input label='Email' iconname='email' value={email} onChangeText={handleEmailChange} />
         <Input
+          type='text'
+          label='Email'
+          iconname='email'
+          value={email}
+          onChangeText={handleEmailChange}
+        />
+        <Input
+          type='password'
           label='Mật khẩu'
           iconname='key'
           value={password}

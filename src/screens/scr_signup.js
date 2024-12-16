@@ -31,7 +31,6 @@ export default function SignUpScreen() {
   const handleReEnterPassword = (value) => {
     setReEnterPassword(value)
   }
-  console.log(userName, password, phoneNumber, email)
   const handleSignUp = async () => {
     if (!userName || !phoneNumber || !email || !password || !reEnterPassword) {
       alert('Vui lòng điền đầy đủ thông tin!')
@@ -99,12 +98,14 @@ export default function SignUpScreen() {
           iconname='key'
           value={password}
           onChangeText={handlePasswordChange}
+          type='password'
         />
         <Input
           label='Nhập lại mật khẩu'
           iconname='key'
           value={reEnterPassword}
           onChangeText={handleReEnterPassword}
+          type='password'
         />
 
         <TouchableOpacity style={styles.btn} onPress={handleSignUp}>

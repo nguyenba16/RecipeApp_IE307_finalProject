@@ -1,17 +1,45 @@
-import React from 'react'
-import { View, StyleSheet, TextInput } from 'react-native'
+import React, { useState } from 'react'
+import { View, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
 import Fontisto from '@expo/vector-icons/Fontisto'
+import MaterialIcons from '@expo/vector-icons/MaterialIcons'
 
-const Input = ({ label, iconname, value, onChangeText }) => {
+const Input = ({ type, label, iconname, value, onChangeText }) => {
+  const [isPasswordVisible, setPasswordVisible] = useState(type === 'password')
+
+  const togglePasswordVisibility = () => {
+    setPasswordVisible(!isPasswordVisible)
+  }
+
   return (
     <View style={styles.text_input}>
+      {/* Icon bên trái */}
       <View style={styles.input_icon}>
         <Fontisto name={iconname} size={25} color='gray' style={styles.icon} />
       </View>
-      <TextInput placeholder={label} value={value} onChangeText={onChangeText}></TextInput>
+
+      {/* TextInput */}
+      <TextInput
+        placeholder={label}
+        value={value}
+        onChangeText={onChangeText}
+        secureTextEntry={isPasswordVisible}
+        style={styles.input}
+      />
+
+      {/* Icon con mắt */}
+      {type === 'password' && (
+        <TouchableOpacity onPress={togglePasswordVisibility} style={styles.eye_icon}>
+          <MaterialIcons
+            name={isPasswordVisible ? 'visibility-off' : 'visibility'}
+            size={25}
+            color='gray'
+          />
+        </TouchableOpacity>
+      )}
     </View>
   )
 }
+
 export default Input
 
 const styles = StyleSheet.create({
@@ -25,12 +53,16 @@ const styles = StyleSheet.create({
     marginTop: 20,
     backgroundColor: '#fff',
     borderRadius: 5,
+    paddingHorizontal: 10,
   },
   input_icon: {
-    margin: 10,
+    marginRight: 10,
   },
   input: {
-    height: 50,
-    width: '90%',
+    flex: 1,
+    height: '100%',
+  },
+  eye_icon: {
+    marginLeft: 10,
   },
 })
