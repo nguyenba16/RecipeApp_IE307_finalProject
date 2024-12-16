@@ -48,12 +48,7 @@ export default function ListIngreNeed() {
       ) : (
         <ScrollView>
           {unavailableIngredients.map((ingredient, index) => (
-            <ItemNeed
-              key={index}
-              id={ingredient.id}
-              ingredient={ingredient}
-              onUpdate={fetchUserDetail}
-            />
+            <ItemNeed key={ingredient._id} ingredient={ingredient} onUpdate={fetchUserDetail} />
           ))}
         </ScrollView>
       )}

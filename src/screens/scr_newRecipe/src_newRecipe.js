@@ -332,17 +332,16 @@ export default function NewRecipe() {
 
         <Text style={styles.title_ingredient}>Nguyên liệu</Text>
         {ingredientList.map((ingre, index) => (
-          <View>
+          <View key={`nl${index}`}>
             {ingredients.map((item) => {
               if (ingre.ingredientID === item._id) {
                 return (
-                  <View>
-                    <ItemIngre
-                      ingredient={item}
-                      quality={ingre.quality}
-                      remove={() => removeIngre(ingre)}
-                    />
-                  </View>
+                  <ItemIngre
+                    key={item._id}
+                    ingredient={item}
+                    quality={ingre.quality}
+                    remove={() => removeIngre(ingre)}
+                  />
                 )
               }
             })}

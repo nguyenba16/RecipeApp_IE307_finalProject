@@ -48,12 +48,7 @@ export default function ListIngreHaved() {
       ) : (
         <ScrollView>
           {availableIngredients.map((ingredient, index) => (
-            <ItemHaved
-              key={index}
-              id={ingredient._id}
-              ingredient={ingredient}
-              onUpdate={fetchUserDetail}
-            />
+            <ItemHaved key={ingredient._id} ingredient={ingredient} onUpdate={fetchUserDetail} />
           ))}
         </ScrollView>
       )}

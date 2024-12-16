@@ -6,7 +6,7 @@ import axios from 'axios'
 import { AuthContext } from '../../components/AuthContext'
 import TraditionalDishCard from './components/TraditionalDishCard'
 import CategroryCard from './components/CategroryCard'
-
+import { useFocusEffect } from '@react-navigation/native'
 const api = axios.create({
   baseURL: 'http://192.168.56.1:5000',
 })
@@ -31,6 +31,8 @@ export default function HomeScreen() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [outstandingDishes, setOutstandingDishes] = useState([])
   const [traditionalDish, setTraditionalDish] = useState([])
+  const traditionalDishRef = useRef(null)
+
   const fetchOutstandingDishes = async () => {
     try {
       const response = await api.get('/outstanding-dishes')
@@ -45,16 +47,27 @@ export default function HomeScreen() {
       const response = await api.get('/traditional-dishes')
       setTraditionalDish(response.data)
     } catch (error) {
-      console.error('Error fetching outstanding dishes:', error)
+      console.error('Error fetching traditional dishes:', error)
     }
   }
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchOutstandingDishes()
+      fetchTraditinalDishes()
+    }, []),
+  )
+
   useEffect(() => {
-    fetchOutstandingDishes()
-    fetchTraditinalDishes()
-  }, [])
+    if (!traditionalDish.length) return
 
-  const flatListRef = useRef(null)
-
+    const interval = setInterval(() => {
+      const nextIndex = (currentIndex + 1) % traditionalDish.length
+      setCurrentIndex(nextIndex)
+      traditionalDishRef.current?.scrollToIndex({ index: nextIndex, animated: true })
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [currentIndex, traditionalDish.length])
   const handleScroll = (event) => {
     const index = Math.round(event.nativeEvent.contentOffset.x / 500)
     setCurrentIndex(index)
@@ -84,13 +97,12 @@ export default function HomeScreen() {
               renderItem={({ item }) => <OutStandingDishCard dish={item} />}
               horizontal
               showsHorizontalScrollIndicator={false}
-              ref={flatListRef}
             />
           </View>
+
           {/* Món truyền thống */}
           <View style={styles.traditional_dish}>
             <Text style={styles.title}>Món ăn truyền thống</Text>
-            {/* lỗi */}
             <FlatList
               data={traditionalDish}
               renderItem={({ item }) => <TraditionalDishCard item={item} />}
@@ -99,9 +111,8 @@ export default function HomeScreen() {
               pagingEnabled
               showsHorizontalScrollIndicator={false}
               onScroll={handleScroll}
-              ref={flatListRef}
+              ref={traditionalDishRef}
             />
-            {/* Pagination Dots */}
             <View style={styles.pagination}>
               {traditionalDish.map((_, index) => (
                 <View
@@ -120,7 +131,6 @@ export default function HomeScreen() {
               renderItem={({ item }) => <CategroryCard item={item} />}
               horizontal
               showsHorizontalScrollIndicator={false}
-              ref={flatListRef}
             />
           </View>
         </View>
@@ -179,46 +189,6 @@ const styles = StyleSheet.create({
   traditional_dish: {
     marginTop: 30,
   },
-  card_traditional: {
-    padding: 5,
-    width: 370,
-    borderRadius: 20,
-    marginHorizontal: 10,
-    backgroundColor: '#fff',
-    overflow: 'hidden',
-  },
-  image_traditional: {
-    width: '100%',
-    height: 240,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-  },
-  dishName_traditional: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    padding: 10,
-  },
-  infoContainer_traditional: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingBottom: 10,
-  },
-  time_traditional: {
-    fontSize: 14,
-    color: '#333',
-  },
-  likebox: {
-    flexDirection: 'row',
-    gap: 3,
-    alignItems: 'center',
-    padding: 5,
-  },
-  likesNumber: {
-    fontSize: 14,
-    color: '#333',
-  },
   pagination: {
     flexDirection: 'row',
     alignSelf: 'center',
@@ -234,11 +204,5 @@ const styles = StyleSheet.create({
   categrory_box: {
     marginTop: 20,
     marginBottom: 30,
-  },
-
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.15)',
-    borderRadius: 20,
   },
 })
