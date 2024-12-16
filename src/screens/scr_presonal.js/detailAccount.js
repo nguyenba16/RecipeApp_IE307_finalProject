@@ -1,73 +1,68 @@
-import React from 'react'
-import { View, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator } from 'react-native'
-import Ionicons from 'react-native-vector-icons/Ionicons'
+import React, { useState, useEffect } from 'react'
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, useFocusEffect } from '@react-navigation/native'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 import { ScrollView } from 'react-native-gesture-handler'
 import axios from 'axios'
-import { AuthContext } from '../../components/AuthContext'
-import { useState, useContext, useEffect } from 'react'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import MyItemRecipe from './components/myrecipeItem'
-import { useFocusEffect } from '@react-navigation/native'
-
+import MyItemRecipe from '../scr_account/components/myrecipeItem'
+import PersonalRecipe from './components/pesonalRecipe'
 const api = axios.create({
   baseURL: 'http://192.168.56.1:5000',
 })
 
-export default function InfoUser() {
+export default function DetailAccount({ route }) {
+  const { userID } = route.params
   const navigation = useNavigation()
-  const { user } = useContext(AuthContext)
   const [hasRecipes, setHasRecipes] = useState(true)
   const [myRecipes, setMyRecipes] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [shared, setShare] = useState(0)
-  const [saved, setSaved] = useState(0)
-  const [liked, setLiked] = useState(0)
-  const getNumbers = () => {
-    if (myRecipes.length === 0) {
-      setSaved(0)
-      setLiked(0)
-      setShare(0)
-    } else {
-      const totalSaves = myRecipes.reduce((acc, recipe) => acc + recipe.saveUsers.length, 0)
-      const totalLikes = myRecipes.reduce((acc, recipe) => acc + recipe.likeUsers.length, 0)
-      const totalShares = myRecipes.length
-      setSaved(totalSaves)
-      setLiked(totalLikes)
-      setShare(totalShares)
+  const [shared, setShare] = useState()
+  const [liked, setLiked] = useState()
+  const [detailUser, setDetailUser] = useState({})
+
+  const fetchUserDetail = async () => {
+    try {
+      const response = await api.get(`/users/${userID}`)
+      if (response.status === 200) {
+        setDetailUser(response.data)
+      }
+    } catch (error) {
+      console.error('Error fetching user details:', error)
     }
   }
 
   const fetchMyRecipes = async () => {
     try {
-      setIsLoading(true)
-      const token = await AsyncStorage.getItem('token')
-      if (!token) {
-        console.error('No token found')
-        return
-      }
-      const userID = user.id
       if (!userID) {
         console.error('No user ID found')
         return
       }
-      const recipes = await api.get(`/my-recipes/${userID}`)
-      if (recipes.data.length > 0) {
+      const response = await api.get(`/my-recipes/${userID}`)
+      if (response && response.data) {
         setHasRecipes(true)
-        setMyRecipes(recipes.data)
+        setMyRecipes(response.data)
       } else {
         setHasRecipes(false)
       }
     } catch (error) {
       console.error('Error fetching my recipes:', error)
-    } finally {
-      setIsLoading(false)
+    }
+  }
+  const getNumbers = () => {
+    if (myRecipes.length === 0) {
+      setLiked(0)
+      setShare(0)
+    } else {
+      const totalLikes = myRecipes.reduce((acc, recipe) => acc + recipe.likeUsers.length, 0)
+      const totalShares = myRecipes.length
+      setLiked(totalLikes)
+      setShare(totalShares)
     }
   }
 
   useFocusEffect(
     React.useCallback(() => {
+      fetchUserDetail()
       fetchMyRecipes()
     }, []),
   )
@@ -75,34 +70,19 @@ export default function InfoUser() {
     getNumbers()
   }, [myRecipes])
 
-  const handleLogout = async () => {
-    await AsyncStorage.removeItem('token')
-    navigation.navigate('LogIn')
-  }
-  if (isLoading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size='large' color='#FF9320' />
-        <Text style={styles.load_text}>Đang tải dữ liệu...</Text>
-      </View>
-    )
-  }
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.title}>
         <TouchableOpacity style={styles.icon_back} onPress={() => navigation.goBack()}>
           <Ionicons name='arrow-back-outline' size={30} color='white' />
         </TouchableOpacity>
-        <Text style={styles.text_title}>Thông tin cá nhân của tôi</Text>
+        <Text style={styles.text_title}>{detailUser.userName}</Text>
       </View>
       <ScrollView style={styles.scrollView}>
-        <Image style={styles.ava} resizeMode='cover' source={{ uri: user.avatar_URL }} />
-        <Text style={styles.name}>{user.userName}</Text>
-        <Text style={styles.email}>{user.email}</Text>
+        <Image style={styles.ava} resizeMode='cover' source={{ uri: detailUser.avatar_URL }} />
+        <Text style={styles.name}>{detailUser.userName}</Text>
+        <Text style={styles.email}>{detailUser.email}</Text>
         <View style={styles.number}>
-          <Text style={styles.liked}>
-            <Text style={styles.bold}>{saved}</Text> lượt lưu
-          </Text>
           <Text style={styles.liked}>
             <Text style={styles.bold}>{liked}</Text> yêu thích
           </Text>
@@ -110,27 +90,18 @@ export default function InfoUser() {
             <Text style={styles.bold}>{shared}</Text> công thức
           </Text>
         </View>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.btn_edit} onPress={() => navigation.navigate('EditInfo')}>
-            <Ionicons style={styles.icon_edit} name='pencil' size={20} color='white' />
-            <Text style={styles.text_edit}>Chỉnh sửa thông tin</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleLogout} style={styles.btn_logout}>
-            <Ionicons style={styles.icon_logout} name='log-out-outline' size={30} color='white' />
-          </TouchableOpacity>
-        </View>
         <View style={styles.divider}></View>
         <View style={styles.sharedRecipesHeader}>
           <Text style={styles.text_share}>Công thức đã chia sẻ</Text>
         </View>
         {!hasRecipes ? (
           <View style={styles.err_box}>
-            <Text style={styles.text_err}>Bạn chưa có công thức nào!</Text>
+            <Text style={styles.text_err}>Bạn chưa có công thức nào nào!</Text>
           </View>
         ) : (
-          <View>
+          <View style={styles.personalRecipes}>
             {myRecipes.map((recipe, index) => (
-              <MyItemRecipe key={index} Recipe={recipe} />
+              <PersonalRecipe key={index} dish={recipe} />
             ))}
           </View>
         )}
@@ -143,6 +114,10 @@ const styles = StyleSheet.create({
   container: {
     height: '100%',
     width: '100%',
+  },
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   scrollView: {
     width: '100%',
@@ -166,7 +141,7 @@ const styles = StyleSheet.create({
   },
   err_box: {
     justifyContent: 'center',
-    height: '90%',
+    height: '50%',
   },
   text_title: {
     flex: 1,
@@ -199,10 +174,11 @@ const styles = StyleSheet.create({
   number: {
     flexDirection: 'row',
     width: '90%',
-    justifyContent: 'space-between',
+    gap: 30,
     marginVertical: 20,
     alignSelf: 'center',
     paddingHorizontal: 10,
+    justifyContent: 'center',
   },
   liked: {
     textAlign: 'left',
@@ -270,13 +246,8 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#FF9320',
   },
-  loadingContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '100%',
-    width: '100%',
-  },
-  load_text: {
-    textAlign: 'center',
+  personalRecipes: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
   },
 })

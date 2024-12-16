@@ -24,7 +24,7 @@ export default function StepRecipe({ route }) {
         renderPagination={(index, total) => (
           <View style={styles.paginationStyle}>
             <TouchableOpacity
-              style={styles.btn_index}
+              style={[styles.btn_index, currentIndex === 0 && styles.btn_disabled]}
               onPress={() => swiperRef.current.scrollBy(-1)}
               disabled={currentIndex === 0}
             >
@@ -35,7 +35,10 @@ export default function StepRecipe({ route }) {
               {index + 1} / {total}{' '}
             </Text>
             <TouchableOpacity
-              style={styles.btn_index}
+              style={[
+                styles.btn_index,
+                currentIndex === recipeSteps.length - 1 && styles.btn_disabled,
+              ]}
               onPress={() => swiperRef.current.scrollBy(+1)}
               disabled={currentIndex === recipeSteps.length - 1}
             >
@@ -133,5 +136,9 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 400,
     resizeMode: 'cover',
+  },
+  btn_disabled: {
+    backgroundColor: '#d3d3d3',
+    opacity: 0.6,
   },
 })

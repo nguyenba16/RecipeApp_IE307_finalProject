@@ -1,4 +1,4 @@
-import { View, StyleSheet, ScrollView, Text } from 'react-native'
+import { View, StyleSheet, ScrollView, Text, ActivityIndicator } from 'react-native'
 import ItemNeed from './ItemNeed'
 import axios from 'axios'
 import { AuthContext } from '../../../components/AuthContext'
@@ -13,14 +13,19 @@ const api = axios.create({
 export default function ListIngreNeed() {
   const { user } = useContext(AuthContext)
   const [unavailableIngredients, setUnavailableIngredient] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+
   const fetchUserDetail = async () => {
     try {
+      setIsLoading(true)
       const response = await api.get(`/users/${user.id}`)
       if (response.status === 200) {
         setUnavailableIngredient(response.data.unavailableIngredients)
       }
     } catch (error) {
       console.error('Error fetching user details:', error)
+    } finally {
+      setIsLoading(false)
     }
   }
   useFocusEffect(
@@ -28,6 +33,14 @@ export default function ListIngreNeed() {
       fetchUserDetail()
     }, []),
   )
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size='large' color='#FF9320' />
+        <Text style={styles.load_text}>Đang tải dữ liệu...</Text>
+      </View>
+    )
+  }
   return (
     <View style={styles.container}>
       {unavailableIngredients.length === 0 ? (
@@ -35,7 +48,7 @@ export default function ListIngreNeed() {
       ) : (
         <ScrollView>
           {unavailableIngredients.map((ingredient, index) => (
-            <ItemNeed key={index} ingredient={ingredient} onUpdate={fetchUserDetail} />
+            <ItemNeed key={ingredient._id} ingredient={ingredient} onUpdate={fetchUserDetail} />
           ))}
         </ScrollView>
       )}
@@ -50,6 +63,15 @@ const styles = StyleSheet.create({
     paddingTop: 5,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100%',
+    width: '100%',
+  },
+  load_text: {
+    textAlign: 'center',
   },
   text_err: {
     fontSize: 15,

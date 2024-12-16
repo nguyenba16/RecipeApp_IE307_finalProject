@@ -8,7 +8,7 @@ const api = axios.create({
   baseURL: 'http://192.168.56.1:5000',
 })
 
-export default function ItemNeed({ ingredient, onUpdate }) {
+export default function ItemNeed({ id, ingredient, onUpdate }) {
   const { user } = useContext(AuthContext)
 
   const handleRemoveIngredientInUnava = async () => {
@@ -19,7 +19,6 @@ export default function ItemNeed({ ingredient, onUpdate }) {
         ingredientID: ingredient.ingredientID._id,
       }
       const response = await api.post('/remove-available-ingredient', req)
-      console.log(response)
       if (response.status === 200) {
         onUpdate()
       }

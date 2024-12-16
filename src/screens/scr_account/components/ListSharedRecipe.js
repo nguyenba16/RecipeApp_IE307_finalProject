@@ -12,14 +12,14 @@ const api = axios.create({
 
 export default function ListSharedRecipe() {
   const { user } = useContext(AuthContext)
-  const [hasRecipes, setHasRecipes] = useState(true)
+  const [hasRecipes, setHasRecipes] = useState(false)
   const [myRecipes, setMyRecipes] = useState([])
 
   const fetchMyRecipes = async () => {
     const userID = user.id
     try {
       const recipes = await api.get(`/my-recipes/${userID}`)
-      if (recipes) {
+      if (recipes.data.length > 0) {
         setHasRecipes(true)
         setMyRecipes(recipes.data)
       } else {
@@ -29,6 +29,7 @@ export default function ListSharedRecipe() {
       console.error('Error: ', error)
     }
   }
+
   useFocusEffect(
     React.useCallback(() => {
       fetchMyRecipes()
@@ -38,7 +39,7 @@ export default function ListSharedRecipe() {
     <View style={styles.container}>
       {!hasRecipes ? (
         <View>
-          <Text style={styles.text_err}>Bạn chưa có công thức nào nào!</Text>
+          <Text style={styles.text_err}>Bạn chưa có công thức nào!</Text>
         </View>
       ) : (
         <ScrollView>

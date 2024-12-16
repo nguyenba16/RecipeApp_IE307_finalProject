@@ -2,30 +2,30 @@ import React, { useState } from 'react'
 import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 
-export default function ItemStep({ method, setmethod }) {
+export default function ItemStep({ cookingSteps, setCookingSteps }) {
   const removeStep = (step) => {
-    const newArray = method.filter((element) => element !== step)
-    setmethod(newArray)
+    const newArray = cookingSteps.filter((element) => element !== step)
+    setCookingSteps(newArray)
   }
   return (
     <View>
-      {method.map((step, index) => {
+      {cookingSteps.map((step, index) => {
         return (
           <View key={index} style={styles.stepCard}>
             <View style={{ flexDirection: 'row' }}>
-              <Text style={styles.method_number}>
-                Bước {index + 1}: {step.title}
+              <Text style={styles.stepNumber}>
+                Bước {index + 1}: {step.stepTitle}
               </Text>
               <TouchableOpacity
                 onPress={() => removeStep(step)}
                 style={{ justifyContent: 'center', marginLeft: 5, alignItems: 'center' }}
               >
-                <Ionicons name='trash-outline' size={25} color='#FF9320' />
+                <Ionicons name='trash-outline' size={25} color='red' />
               </TouchableOpacity>
             </View>
-            <Text style={styles.text_method}>{step.detail}</Text>
-            <View style={styles.title_method}>
-              <Image source={{ uri: step.image }} style={styles.upload_method} />
+            <View style={styles.info_step}>
+              <Image source={{ uri: step.img_step }} style={styles.img} />
+              <Text style={styles.text_method}>{step.step_desc}</Text>
             </View>
           </View>
         )
@@ -54,34 +54,32 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginTop: 5,
   },
-  method_number: {
+  stepNumber: {
     fontSize: 18,
-    textAlign: 'center',
-    textAlignVertical: 'center',
-    textAlign: 'left',
-    fontWeight: '500',
+    fontWeight: 'bold',
     width: '95%',
     backgroundColor: '#FFEDD7',
     borderRadius: 5,
     padding: 5,
   },
-  text_title_method: {
-    width: '100%',
-    fontSize: 15,
-    borderRadius: 5,
-    backgroundColor: '#F5F5F5',
-  },
-  upload_method: {
+  img: {
     width: '40%',
     height: 120,
     justifyContent: 'center',
     borderRadius: 5,
   },
   text_method: {
+    width: '60%',
     fontSize: 15,
     borderRadius: 5,
-    textAlignVertical: 'center',
-    textAlign: 'left',
+    textAlignVertical: 'top',
     paddingHorizontal: 5,
+  },
+  info_step: {
+    marginTop: 10,
+    flexDirection: 'row',
+    padding: 5,
+    gap: 10,
+    justifyContent: 'space-between',
   },
 })
