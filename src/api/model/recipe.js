@@ -23,6 +23,7 @@ const recipeSchema = new mongoose.Schema({
     },
   ],
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  nameToSearch: { type: String },
 })
 const Recipe = mongoose.model('Recipe', recipeSchema, 'Recipe')
 export default Recipe

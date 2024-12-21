@@ -11,6 +11,7 @@ import { ScrollView } from 'react-native-gesture-handler'
 import ItemRecipe from '../components/ItemRecipe'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
+import removeAccents from 'remove-accents'
 
 const api = axios.create({
   baseURL: 'http://192.168.56.1:5000',
@@ -28,7 +29,7 @@ export default function SearchScreen({ route }) {
     try {
       setIsLoading(true)
       const requestData = {
-        nameDish: searchValue,
+        nameDish: removeAccents(searchValue),
         category: category,
       }
       const res = await api.post('/search', requestData)
@@ -50,6 +51,7 @@ export default function SearchScreen({ route }) {
   }, [category])
 
   useEffect(() => {
+    setCategrory(cate)
     fetchRecipes()
   }, [])
 

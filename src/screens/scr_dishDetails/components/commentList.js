@@ -7,6 +7,7 @@ const api = axios.create({
 })
 
 const CommentList = ({ data }) => {
+  console.log(data)
   return (
     <View style={styles.cmt_box}>
       {data.map((comment, index) => {

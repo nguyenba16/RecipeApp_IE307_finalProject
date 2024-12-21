@@ -12,6 +12,7 @@ import authMiddleware from './authMiddleware.js'
 import multer from 'multer'
 import { Cloudinary } from './config/cloundinaryCofig.js'
 import { CloudinaryStorage } from 'multer-storage-cloudinary'
+import removeAccents from 'remove-accents'
 
 dotenv.config()
 const app = express()
@@ -69,27 +70,30 @@ app.get('/users/:id', async (req, res) => {
 })
 
 // Search
-app.get('/search', async (req, res) => {
-  try {
-    const { nameDish } = req.query
-    if (!nameDish) {
-      const recipes = await Recipe.find()
-      return res.json(recipes)
-    }
-    const recipes = await Recipe.find({
-      nameDish: { $regex: nameDish, $options: 'i' }, // 'i' để tìm kiếm không phân biệt hoa/thường
-    })
-    if (recipes.length === 0) {
-      return res.status(404).json({ message: 'No recipes found.' })
-    }
+// app.get('/search', async (req, res) => {
+//   try {
+//     const { nameDish } = req.query;
+//     if (!nameDish) {
+//       const recipes = await Recipe.find();
+//       return res.json(recipes);
+//     }
 
-    console.log(recipes)
-    res.json(recipes)
-  } catch (error) {
-    console.error('Error fetching recipes:', error)
-    res.status(500).send(error)
-  }
-})
+//     // Tìm kiếm bằng trường nameToSearch với regex (không phân biệt hoa thường)
+//     const recipes = await Recipe.find({
+//       nameToSearch: { $regex: nameDish, $options: 'i' },
+//     });
+
+//     // Nếu không tìm thấy, trả về lỗi 404
+//     if (recipes.length === 0) {
+//       return res.status(404).json({ message: 'No recipes found.' });
+//     }
+
+//     res.json(recipes);
+//   } catch (error) {
+//     console.error('Error fetching recipes:', error);
+//     res.status(500).send({ error: 'Internal Server Error' });
+//   }
+// });
 
 // Sign in
 const secretKey = process.env.SECRET_KEY || 'defaultSecretKey'
@@ -171,6 +175,7 @@ app.post('/add', upload.array('stepImages'), async (req, res) => {
       createdBy,
       ingredientList,
       cookingSteps,
+      nameToSearch,
     } = req.body
 
     const imgURL = req.files?.[0]?.path // Upload ảnh chính lên Cloudinary
@@ -198,6 +203,7 @@ app.post('/add', upload.array('stepImages'), async (req, res) => {
       desc,
       categroryType,
       createdBy,
+      nameToSearch,
       ingredientList: ingredientList ? JSON.parse(ingredientList) : [],
       cookingSteps: finalCookingSteps,
     })
@@ -456,6 +462,39 @@ app.get('/detailpage/:id', async (req, res) => {
   }
 })
 
+// api lấy số like của 1 bài viết
+app.get('/get-like/:id', async (req, res) => {
+  const recipeId = req.params.id
+  try {
+    const recipe = await Recipe.findById(recipeId)
+    if (!recipe) {
+      return res.status(404).json({ message: 'Recipe not found' })
+    }
+    const likeCount = recipe.likeUsers.length
+    const saveCount = recipe.saveUsers.length
+    res.status(200).json({ likeCount, saveCount })
+  } catch (error) {
+    console.error('Error fetching like number:', error)
+    res.status(500).json({ message: 'Internal server error', error: error.message })
+  }
+})
+
+// api lấy all comment của 1 bài viết
+app.get('/get-comment/:id', async (req, res) => {
+  const recipeId = req.params.id
+  try {
+    const commentList = await Comment.find({ recipeID: recipeId }).populate(
+      'idUser',
+      'userName email avatar_URL',
+    )
+    console.log('comments: ', commentList)
+    res.status(200).json(commentList)
+  } catch (error) {
+    console.error('Error fetching comments:', error)
+    res.status(500).json({ message: 'Internal server error', error: error.message })
+  }
+})
+
 // Api xử lý like
 app.post('/like/:recipeId', async (req, res) => {
   const { userId } = req.body
@@ -503,6 +542,8 @@ app.post('/save/:recipeId', async (req, res) => {
 // Api search
 app.post('/search', async (req, res) => {
   const { nameDish, category } = req.body
+  console.log('category: ', category)
+  console.log('namedish: ', nameDish)
   try {
     let recipes
     if (category && !nameDish) {
@@ -511,7 +552,7 @@ app.post('/search', async (req, res) => {
         'userName avatar_URL',
       )
     } else if (!category && nameDish) {
-      recipes = await Recipe.find({ nameDish: { $regex: nameDish, $options: 'i' } }).populate(
+      recipes = await Recipe.find({ nameToSearch: { $regex: nameDish, $options: 'i' } }).populate(
         'createdBy',
         'userName avatar_URL',
       )
@@ -519,13 +560,14 @@ app.post('/search', async (req, res) => {
       recipes = await Recipe.find().populate('createdBy', 'userName avatar_URL')
     } else if (category && nameDish) {
       recipes = await Recipe.find({
-        nameDish: { $regex: nameDish, $options: 'i' },
+        nameToSearch: { $regex: nameDish, $options: 'i' },
         categroryType: { $regex: category, $options: 'i' },
       }).populate('createdBy', 'userName avatar_URL')
     }
     if (recipes.length === 0) {
       return res.status(404).json({ error: 'No recipes found' })
     }
+    console.log(recipes)
     res.status(200).json({ recipes })
   } catch (error) {
     console.error('Error in search:', error)

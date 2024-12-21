@@ -45,7 +45,7 @@ export default function DishDetail({ route }) {
       const response = await api.get(`/detailpage/${dishID}`)
       const { recipe, comments, ingredients } = response.data
       setDetailDish(recipe)
-      setCommentList(comments)
+      // setCommentList(comments)
       setIngredients(ingredients)
       setIsLike(recipe.likeUsers.includes(userId))
       setIsSave(recipe.saveUsers.includes(userId))
@@ -53,6 +53,28 @@ export default function DishDetail({ route }) {
       console.error('Error fetching dish:', error)
     } finally {
       setIsLoading(false)
+    }
+  }
+  const [likeNumber, setLikeNumber] = useState(0)
+  const [saveNumber, setSaveNumber] = useState(0)
+
+  const fetchingReactNumber = async () => {
+    try {
+      const response = await api.get(`/get-like/${dishID}`)
+      const { likeCount, saveCount } = response.data
+      setLikeNumber(likeCount)
+      setSaveNumber(saveCount)
+    } catch (error) {
+      console.error('Error fetching react number:', error)
+    }
+  }
+
+  const fetchingCommentList = async () => {
+    try {
+      const comments = await api.get(`/get-comment/${dishID}`)
+      setCommentList(comments.data)
+    } catch (error) {
+      console.error('Error fetching comments:', error)
     }
   }
 
@@ -63,7 +85,7 @@ export default function DishDetail({ route }) {
     } catch (error) {
       console.error('Lỗi khi xử lý like', error)
     }
-    fetchDetailDish()
+    fetchingReactNumber()
   }
 
   const handleSave = async () => {
@@ -73,7 +95,7 @@ export default function DishDetail({ route }) {
     } catch (error) {
       console.error('Lỗi khi xử lý save', error)
     }
-    fetchDetailDish()
+    fetchingReactNumber()
   }
 
   const handleSendComment = async () => {
@@ -84,7 +106,8 @@ export default function DishDetail({ route }) {
         idUser: userId,
       })
       setComment('')
-      fetchDetailDish()
+      fetchingCommentList()
+      // fetchDetailDish()
     } catch (error) {
       console.error('Error sending comment:', error)
     }
@@ -92,6 +115,8 @@ export default function DishDetail({ route }) {
 
   useEffect(() => {
     fetchDetailDish()
+    fetchingReactNumber()
+    fetchingCommentList()
   }, [])
 
   if (isLoading) {
@@ -128,13 +153,13 @@ export default function DishDetail({ route }) {
                 <TouchableOpacity onPress={handleSave} style={styles.react}>
                   <Icon name={isSave ? 'bookmark' : 'bookmark-o'} size={30} />
                 </TouchableOpacity>
-                <Text style={styles.count_react}>{detailDish.saveUsers.length}</Text>
+                <Text style={styles.count_react}>{saveNumber}</Text>
               </View>
               <View style={styles.react_icon_count}>
                 <TouchableOpacity onPress={handleLike} style={styles.react}>
                   <Icon name={isLike ? 'heart' : 'heart-o'} size={28} />
                 </TouchableOpacity>
-                <Text style={styles.count_react}>{detailDish.likeUsers.length}</Text>
+                <Text style={styles.count_react}>{likeNumber}</Text>
               </View>
             </View>
           </View>

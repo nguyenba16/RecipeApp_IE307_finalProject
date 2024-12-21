@@ -12,6 +12,7 @@ import { useEffect, useContext } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import axios from 'axios'
 import { AuthContext } from '../../components/AuthContext'
+import removeAccents from 'remove-accents'
 
 const api = axios.create({
   baseURL: 'http://192.168.56.1:5000',
@@ -211,6 +212,7 @@ export default function NewRecipe() {
       formData.append('servingNumber', servingNumber)
       formData.append('cookingTime', cookingTime)
       formData.append('categroryType', categroryType)
+      formData.append('nameToSearch', removeAccents(nameDish))
       formData.append('ingredientList', JSON.stringify(ingredientList))
       formData.append('cookingSteps', JSON.stringify(cookingSteps))
       const response = await api.post('/add', formData, {
