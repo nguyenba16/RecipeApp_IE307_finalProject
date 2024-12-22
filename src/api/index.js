@@ -705,6 +705,49 @@ app.patch('/update-profile', upload.single('avatar_URL'), async (req, res) => {
   }
 })
 
+
+// API thêm một nguyên liệu mới
+app.post('/add-ingredient', upload.single('imgIngredient'), async (req, res) => {
+  try {
+    // Lấy dữ liệu từ body request
+    const { IngredientName, unit } = req.body;
+
+    // Kiểm tra nếu không có file được upload
+    if (!req.file) {
+      return res.status(400).json({ message: 'Vui lòng upload ảnh của nguyên liệu!' });
+    }
+
+    // Kiểm tra xem nguyên liệu đã tồn tại chưa
+    const existingIngredient = await Ingredient.findOne({ IngredientName });
+    if (existingIngredient) {
+      return res.status(400).json({ message: 'Nguyên liệu đã tồn tại!' });
+    }
+
+    // URL của ảnh đã được upload lên Cloudinary
+    const imgIngredient = req.file.path;
+
+    // Tạo một tài liệu mới cho nguyên liệu
+    const newIngredient = new Ingredient({
+      IngredientName,
+      unit,
+      imgIngredient,
+    });
+
+    // Lưu vào database
+    await newIngredient.save();
+
+    res.status(201).json({
+      message: 'Thêm nguyên liệu mới thành công!',
+      data: newIngredient,
+    });
+  } catch (error) {
+    console.error('Lỗi khi thêm nguyên liệu mới:', error);
+    res.status(500).json({ message: 'Lỗi server!', error: error.message });
+  }
+});
+
+
+
 const PORT = 5000
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running at http://192.168.56.1:${PORT}`)

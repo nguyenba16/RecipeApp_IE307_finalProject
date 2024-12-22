@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, Alert } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, Alert, Modal } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -13,7 +13,6 @@ import { useNavigation } from '@react-navigation/native'
 import axios from 'axios'
 import { AuthContext } from '../../components/AuthContext'
 import removeAccents from 'remove-accents'
-
 const api = axios.create({
   baseURL: 'http://192.168.56.1:5000',
 })
@@ -53,6 +52,64 @@ export default function NewRecipe() {
   //Nhận đường dẫn của ảnh món ăn
   const [photo, setPhoto] = useState('')
 
+  const [showModal, setShowModal] = useState(false)
+  const [customIngredientName, setCustomIngredientName] = useState('')
+  const [customIngredientImage, setCustomIngredientImage] = useState(null)
+  const [customIngredientUnit, setCustomIngredientUnit] = useState('')
+
+  const openImageForCustomIngredient = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync()
+    if (permissionResult.granted === false) {
+      alert('Permission to access camera roll is required!')
+      return
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    })
+    if (!result.canceled) {
+      setCustomIngredientImage(result.assets[0].uri)
+    }
+  }
+
+  const handleSaveCustomIngredient = async () => {
+    if (!customIngredientName || !customIngredientImage || !customIngredientUnit) {
+      Alert.alert('Lỗi', 'Vui lòng nhập đầy đủ thông tin nguyên liệu!')
+      return
+    }
+
+    try {
+      const formData = new FormData()
+      formData.append('IngredientName', customIngredientName)
+      formData.append('unit', customIngredientUnit)
+      formData.append('imgIngredient', {
+        uri: customIngredientImage,
+        name: 'ingredient.jpg',
+        type: 'image/jpeg',
+      })
+
+      const response = await api.post('/add-ingredient', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+
+      if (response.status === 201) {
+        Alert.alert('Thành công', 'Nguyên liệu mới đã được thêm!')
+        fetchIngredients() // Tải lại danh sách nguyên liệu
+        setShowModal(false)
+        setCustomIngredientName('')
+        setCustomIngredientImage(null)
+        setCustomIngredientUnit('')
+      } else {
+        Alert.alert('Thất bại', 'Không thể thêm nguyên liệu mới!')
+      }
+    } catch (error) {
+      console.error('Lỗi khi thêm nguyên liệu:', error.message)
+      Alert.alert('Lỗi', 'Nguyên liệu đã tồn tại!')
+    }
+  }
+
   const openImage = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync()
     if (permissionResult.granted === false) {
@@ -90,7 +147,7 @@ export default function NewRecipe() {
   const [categroryType, setCategroryType] = useState()
   const [ingredient, setIngredient] = useState()
 
-  const pickerItems = ingredients.map((item) => ({ label: item.IngredientName, value: item._id }))
+  const pickerItems = ingredients.sort((a, b) => a.IngredientName.localeCompare(b.IngredientName)) .map((item) => ({ label: item.IngredientName, value: item._id }))
   //Nhận img của từng nguyên liệu
   const [imgIngre, setImgIngre] = useState()
   //Nhận giá trị của số lượng
@@ -349,6 +406,69 @@ export default function NewRecipe() {
             })}
           </View>
         ))}
+        <Modal 
+          visible={showModal} 
+          animationType="slide" 
+          transparent={true}
+        >
+          <View 
+            style={styles.back_around_modal}
+          >
+            <View 
+              style={styles.back_modal}
+            >
+              <View style={styles.back_input}>
+                <TouchableOpacity style={styles.up_new_ingre} onPress={openImageForCustomIngredient}>
+                  {customIngredientImage ? (
+                    <Image
+                      source={{ uri: customIngredientImage }}
+                      style={{height: 91, width: 91, borderRadius: 5}}
+                    />
+                  ) : (
+                    <Text>Thêm ảnh</Text>
+                  )}
+                </TouchableOpacity>
+                <View style={{flex: 1}}>
+                  <TextInput
+                    style={styles.input_newIngre}
+                    placeholder="Tên nguyên liệu"
+                    value={customIngredientName}
+                    onChangeText={setCustomIngredientName}
+                  />
+                  
+                  <TextInput
+                    style={styles.input_newIngre}
+                    placeholder="Đơn vị"
+                    value={customIngredientUnit}
+                    onChangeText={setCustomIngredientUnit}
+                  />
+                </View>
+              </View>
+              <View 
+                style={styles.back_button_new}
+              >  
+                <TouchableOpacity 
+                  style={styles.back_button}  
+                  onPress={() => setShowModal(false)}
+                >
+                  <Text style={styles.text_button_new}>Hủy</Text>
+                </TouchableOpacity>
+                <TouchableOpacity  
+                  style={{
+                    backgroundColor: "#FF9320", 
+                    marginHorizontal: 10, 
+                    paddingVertical: 5, 
+                    width: 80, 
+                    borderRadius: 5,
+                  }}      
+                  onPress={handleSaveCustomIngredient}
+                >
+                  <Text style={styles.text_button_new}>Lưu</Text>
+                </TouchableOpacity>            
+              </View>
+            </View>
+          </View>
+        </Modal>
 
         <View style={styles.ingredient}>
           <Image style={styles.img_ingre} source={{ uri: imgIngre }} />
@@ -356,8 +476,14 @@ export default function NewRecipe() {
             <RNPickerSelect
               placeholder={{ label: 'Chọn nguyên liệu', value: null }}
               value={ingredient}
-              onValueChange={(value) => handleIngredientChange(value)}
-              items={pickerItems}
+              onValueChange={(value) => {if (value === 'custom') {
+                  setShowModal(true)
+                } else {
+                  handleIngredientChange(value)
+                }
+              }}
+              items={[...pickerItems,
+                { label: 'Khác', value: 'custom' },]}
             />
           </View>
           <TextInput
@@ -671,4 +797,65 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     flexDirection: 'row',
   },
+  input_newIngre: {
+    borderWidth: 1,
+    borderColor: "#CFCFCF",
+    marginHorizontal: 5,
+    marginVertical: 2,
+    borderRadius: 5,
+    width: "100%",
+    fontSize: 15,
+  },
+  up_new_ingre: {
+    height: 90,
+    width: 90,
+    borderColor: '#CFCFCF',
+    borderStyle: 'dashed',
+    borderRadius: 5,
+    borderWidth: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
+  },
+  back_modal: {
+    backgroundColor: "white", 
+    padding: 20, 
+    borderRadius: 10, 
+    alignItems: "center",
+    width: "90%", 
+    shadowColor: "#000", 
+    shadowOffset: { width: 0, height: 2 }, 
+    shadowOpacity: 0.25, 
+    shadowRadius: 4, 
+  },
+  back_around_modal: {
+    flex: 1, 
+    justifyContent: "center", 
+    alignItems: "center", 
+    backgroundColor: "rgba(0, 0, 0, 0.5)"
+  },
+  back_input: {
+    flexDirection: "row", 
+    justifyContent: "center", 
+    alignItems: "center"
+  },
+  back_button_new: {
+    flexDirection: "row", 
+    alignItems: "center", 
+    justifyContent: "center",
+    marginTop: 10
+  },
+  back_button: {
+      backgroundColor: "#FF9320", 
+      marginHorizontal: 10, 
+      paddingVertical: 5, 
+      width: 80, 
+      borderRadius: 5
+  },
+  text_button_new:{
+    textAlign: "center", 
+    fontSize: 18, 
+    color: "white", 
+    fontWeight: "600"
+  }
 })
