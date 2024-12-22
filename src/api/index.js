@@ -164,6 +164,7 @@ app.post(
           throw new Error('Không thể upload ảnh lên Cloudinary.')
         }
       }
+      console.log('categroryType: ', categroryType)
       const mainImageFile = req.files?.mainImage?.[0]
       if (!mainImageFile) {
         return res.status(400).json({ message: 'Ảnh chính của món ăn không được cung cấp.' })

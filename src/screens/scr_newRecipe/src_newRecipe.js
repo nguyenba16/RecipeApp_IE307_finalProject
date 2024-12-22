@@ -8,6 +8,7 @@ import {
   Image,
   Alert,
   Modal,
+  ActivityIndicator,
 } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -31,6 +32,7 @@ export default function NewRecipe() {
   const navigation = useNavigation()
   const [isErrorAddIngre, setIsErrorAddIngre] = useState(false)
   const [isErrorAddStep, setIsErrorAddStep] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   //Kiểm soát các trường thông tin nhập vào
   const [stateShare, setStateShare] = useState(false)
   useEffect(() => {
@@ -264,51 +266,37 @@ export default function NewRecipe() {
 
   const handleSubmitRecipe = async () => {
     try {
+      setIsLoading(true)
       const formData = new FormData()
-
-      // Thêm ảnh chính
       if (photo) {
         formData.append('mainImage', {
-          uri: photo, // Đảm bảo đường dẫn ảnh chính
+          uri: photo,
           name: 'mainImage.jpg',
           type: 'image/jpeg',
         })
       }
-
-      // Thêm các thông tin khác
       formData.append('createdBy', user.id)
       formData.append('nameDish', nameDish)
       formData.append('desc', desc)
       formData.append('servingNumber', servingNumber)
       formData.append('cookingTime', cookingTime)
       formData.append('categroryType', categroryType)
+      console.log('categroryType: ', categroryType)
       formData.append('nameToSearch', removeAccents(nameDish))
-
-      // Chuyển ingredientList thành chuỗi JSON
       formData.append('ingredientList', JSON.stringify(ingredientList))
-
-      // Chuyển cookingSteps thành chuỗi JSON
       formData.append('cookingSteps', JSON.stringify(cookingSteps))
-
-      // Thêm ảnh các bước nấu ăn
       cookingSteps.forEach((step, index) => {
         if (step.img_step) {
-          // Kiểm tra nếu bước có ảnh
           formData.append('stepImages', {
-            uri: step.img_step, // Đảm bảo đường dẫn ảnh của bước
+            uri: step.img_step,
             name: `stepImage_${index}.jpg`,
             type: 'image/jpeg',
           })
         }
       })
-
-      console.log('Dữ liệu gửi đi: ', formData)
-
-      // Gửi dữ liệu tới API
       const response = await api.post('/add', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
-
       if (response.status === 201) {
         Alert.alert('Thêm công thức thành công', response.data.message)
         navigation.goBack()
@@ -318,89 +306,19 @@ export default function NewRecipe() {
     } catch (error) {
       console.error('Lỗi khi gửi dữ liệu:', error.message)
       Alert.alert('Có lỗi xảy ra, thử lại sau.')
+    } finally {
+      setIsLoading(false)
     }
   }
 
-  // const handleSubmitRecipe = async () => {
-  //   try {
-  //     const formData = new FormData()
-  //     if (photo) {
-  //       formData.append('stepImages', {
-  //         uri: photo,
-  //         name: 'photo.jpg',
-  //         type: 'image/jpeg',
-  //       })
-  //     }
-  //     formData.append('createdBy', user.id)
-  //     formData.append('nameDish', nameDish)
-  //     formData.append('desc', desc)
-  //     formData.append('servingNumber', servingNumber)
-  //     formData.append('cookingTime', cookingTime)
-  //     formData.append('categroryType', categroryType)
-  //     formData.append('nameToSearch', removeAccents(nameDish))
-  //     formData.append('ingredientList', JSON.stringify(ingredientList))
-
-  //     formData.append('cookingSteps', JSON.stringify(cookingSteps))
-  //     console.log(cookingSteps)
-  //     const response = await api.post('/add', formData, {
-  //       headers: { 'Content-Type': 'multipart/form-data' },
-  //     })
-  //     if (response.status === 201) {
-  //       Alert.alert('Thêm công thức thành công', response.data.message)
-  //       navigation.goBack()
-  //     } else {
-  //       Alert.alert('Thêm công thức thất bại')
-  //     }
-  //   } catch (error) {
-  //     console.error('Lỗi khi gửi dữ liệu:', error.message)
-  //     Alert.alert('Có lỗi xảy ra, thử lại sau.')
-  //   }
-  // }
-
-  // const handleSubmitRecipe = async () => {
-  //   try {
-  //     const formData = new FormData();
-  //     if (!photo) {
-  //       Alert.alert('Bạn cần chọn ảnh chính cho món ăn!');
-  //       return;
-  //     }
-  //     formData.append('photo', {
-  //       uri: photo,
-  //       name: 'mainPhoto.jpg',
-  //       type: 'image/jpeg',
-  //     });
-  //     cookingSteps.forEach((step, index) => {
-  //       if (step.img_step) {
-  //         formData.append('stepImages', {
-  //           uri: photo,
-  //           name: 'mainPhoto.jpg',
-  //           type: 'image/jpeg',
-  //         });
-  //       }
-  //     });
-  //     formData.append('createdBy', user.id);
-  //     formData.append('nameDish', nameDish);
-  //     formData.append('desc', desc);
-  //     formData.append('servingNumber', servingNumber);
-  //     formData.append('cookingTime', cookingTime);
-  //     formData.append('categroryType', categroryType);
-  //     formData.append('nameToSearch', removeAccents(nameDish));
-  //     formData.append('ingredientList', JSON.stringify(ingredientList));
-  //     formData.append('cookingSteps', JSON.stringify(cookingSteps));
-  //     const response = await api.post('/add', formData, {
-  //       headers: { 'Content-Type': 'multipart/form-data' },
-  //     });
-  //     if (response.status === 201) {
-  //       Alert.alert('Thêm công thức thành công', response.data.message);
-  //       navigation.goBack();
-  //     } else {
-  //       Alert.alert('Thêm công thức thất bại');
-  //     }
-  //   } catch (error) {
-  //     console.error('Lỗi khi gửi dữ liệu:', error.message);
-  //     Alert.alert('Có lỗi xảy ra, thử lại sau.');
-  //   }
-  // };
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size='large' color='#FF9320' />
+        <Text style={styles.load_text}>Đang thêm công thức mới</Text>
+      </View>
+    )
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -674,6 +592,15 @@ const styles = StyleSheet.create({
   },
   scroll: {
     width: '100%',
+  },
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100%',
+    width: '100%',
+  },
+  load_text: {
+    textAlign: 'center',
   },
   title: {
     flexDirection: 'row',
