@@ -1,5 +1,14 @@
 import React from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, Alert, Modal } from 'react-native'
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  TextInput,
+  Image,
+  Alert,
+  Modal,
+} from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -89,14 +98,12 @@ export default function NewRecipe() {
         name: 'ingredient.jpg',
         type: 'image/jpeg',
       })
-
       const response = await api.post('/add-ingredient', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
-
       if (response.status === 201) {
         Alert.alert('Thành công', 'Nguyên liệu mới đã được thêm!')
-        fetchIngredients() // Tải lại danh sách nguyên liệu
+        fetchIngredients()
         setShowModal(false)
         setCustomIngredientName('')
         setCustomIngredientImage(null)
@@ -147,7 +154,9 @@ export default function NewRecipe() {
   const [categroryType, setCategroryType] = useState()
   const [ingredient, setIngredient] = useState()
 
-  const pickerItems = ingredients.sort((a, b) => a.IngredientName.localeCompare(b.IngredientName)) .map((item) => ({ label: item.IngredientName, value: item._id }))
+  const pickerItems = ingredients
+    .sort((a, b) => a.IngredientName.localeCompare(b.IngredientName))
+    .map((item) => ({ label: item.IngredientName, value: item._id }))
   //Nhận img của từng nguyên liệu
   const [imgIngre, setImgIngre] = useState()
   //Nhận giá trị của số lượng
@@ -256,13 +265,17 @@ export default function NewRecipe() {
   const handleSubmitRecipe = async () => {
     try {
       const formData = new FormData()
+
+      // Thêm ảnh chính
       if (photo) {
-        formData.append('stepImages', {
-          uri: photo,
-          name: 'photo.jpg',
+        formData.append('mainImage', {
+          uri: photo, // Đảm bảo đường dẫn ảnh chính
+          name: 'mainImage.jpg',
           type: 'image/jpeg',
         })
       }
+
+      // Thêm các thông tin khác
       formData.append('createdBy', user.id)
       formData.append('nameDish', nameDish)
       formData.append('desc', desc)
@@ -270,11 +283,32 @@ export default function NewRecipe() {
       formData.append('cookingTime', cookingTime)
       formData.append('categroryType', categroryType)
       formData.append('nameToSearch', removeAccents(nameDish))
+
+      // Chuyển ingredientList thành chuỗi JSON
       formData.append('ingredientList', JSON.stringify(ingredientList))
+
+      // Chuyển cookingSteps thành chuỗi JSON
       formData.append('cookingSteps', JSON.stringify(cookingSteps))
+
+      // Thêm ảnh các bước nấu ăn
+      cookingSteps.forEach((step, index) => {
+        if (step.img_step) {
+          // Kiểm tra nếu bước có ảnh
+          formData.append('stepImages', {
+            uri: step.img_step, // Đảm bảo đường dẫn ảnh của bước
+            name: `stepImage_${index}.jpg`,
+            type: 'image/jpeg',
+          })
+        }
+      })
+
+      console.log('Dữ liệu gửi đi: ', formData)
+
+      // Gửi dữ liệu tới API
       const response = await api.post('/add', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
+
       if (response.status === 201) {
         Alert.alert('Thêm công thức thành công', response.data.message)
         navigation.goBack()
@@ -286,6 +320,87 @@ export default function NewRecipe() {
       Alert.alert('Có lỗi xảy ra, thử lại sau.')
     }
   }
+
+  // const handleSubmitRecipe = async () => {
+  //   try {
+  //     const formData = new FormData()
+  //     if (photo) {
+  //       formData.append('stepImages', {
+  //         uri: photo,
+  //         name: 'photo.jpg',
+  //         type: 'image/jpeg',
+  //       })
+  //     }
+  //     formData.append('createdBy', user.id)
+  //     formData.append('nameDish', nameDish)
+  //     formData.append('desc', desc)
+  //     formData.append('servingNumber', servingNumber)
+  //     formData.append('cookingTime', cookingTime)
+  //     formData.append('categroryType', categroryType)
+  //     formData.append('nameToSearch', removeAccents(nameDish))
+  //     formData.append('ingredientList', JSON.stringify(ingredientList))
+
+  //     formData.append('cookingSteps', JSON.stringify(cookingSteps))
+  //     console.log(cookingSteps)
+  //     const response = await api.post('/add', formData, {
+  //       headers: { 'Content-Type': 'multipart/form-data' },
+  //     })
+  //     if (response.status === 201) {
+  //       Alert.alert('Thêm công thức thành công', response.data.message)
+  //       navigation.goBack()
+  //     } else {
+  //       Alert.alert('Thêm công thức thất bại')
+  //     }
+  //   } catch (error) {
+  //     console.error('Lỗi khi gửi dữ liệu:', error.message)
+  //     Alert.alert('Có lỗi xảy ra, thử lại sau.')
+  //   }
+  // }
+
+  // const handleSubmitRecipe = async () => {
+  //   try {
+  //     const formData = new FormData();
+  //     if (!photo) {
+  //       Alert.alert('Bạn cần chọn ảnh chính cho món ăn!');
+  //       return;
+  //     }
+  //     formData.append('photo', {
+  //       uri: photo,
+  //       name: 'mainPhoto.jpg',
+  //       type: 'image/jpeg',
+  //     });
+  //     cookingSteps.forEach((step, index) => {
+  //       if (step.img_step) {
+  //         formData.append('stepImages', {
+  //           uri: photo,
+  //           name: 'mainPhoto.jpg',
+  //           type: 'image/jpeg',
+  //         });
+  //       }
+  //     });
+  //     formData.append('createdBy', user.id);
+  //     formData.append('nameDish', nameDish);
+  //     formData.append('desc', desc);
+  //     formData.append('servingNumber', servingNumber);
+  //     formData.append('cookingTime', cookingTime);
+  //     formData.append('categroryType', categroryType);
+  //     formData.append('nameToSearch', removeAccents(nameDish));
+  //     formData.append('ingredientList', JSON.stringify(ingredientList));
+  //     formData.append('cookingSteps', JSON.stringify(cookingSteps));
+  //     const response = await api.post('/add', formData, {
+  //       headers: { 'Content-Type': 'multipart/form-data' },
+  //     });
+  //     if (response.status === 201) {
+  //       Alert.alert('Thêm công thức thành công', response.data.message);
+  //       navigation.goBack();
+  //     } else {
+  //       Alert.alert('Thêm công thức thất bại');
+  //     }
+  //   } catch (error) {
+  //     console.error('Lỗi khi gửi dữ liệu:', error.message);
+  //     Alert.alert('Có lỗi xảy ra, thử lại sau.');
+  //   }
+  // };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -406,65 +521,55 @@ export default function NewRecipe() {
             })}
           </View>
         ))}
-        <Modal 
-          visible={showModal} 
-          animationType="slide" 
-          transparent={true}
-        >
-          <View 
-            style={styles.back_around_modal}
-          >
-            <View 
-              style={styles.back_modal}
-            >
+        <Modal visible={showModal} animationType='slide' transparent={true}>
+          <View style={styles.back_around_modal}>
+            <View style={styles.back_modal}>
               <View style={styles.back_input}>
-                <TouchableOpacity style={styles.up_new_ingre} onPress={openImageForCustomIngredient}>
+                <TouchableOpacity
+                  style={styles.up_new_ingre}
+                  onPress={openImageForCustomIngredient}
+                >
                   {customIngredientImage ? (
                     <Image
                       source={{ uri: customIngredientImage }}
-                      style={{height: 91, width: 91, borderRadius: 5}}
+                      style={{ height: 91, width: 91, borderRadius: 5 }}
                     />
                   ) : (
                     <Text>Thêm ảnh</Text>
                   )}
                 </TouchableOpacity>
-                <View style={{flex: 1}}>
+                <View style={{ flex: 1 }}>
                   <TextInput
                     style={styles.input_newIngre}
-                    placeholder="Tên nguyên liệu"
+                    placeholder='Tên nguyên liệu'
                     value={customIngredientName}
                     onChangeText={setCustomIngredientName}
                   />
-                  
+
                   <TextInput
                     style={styles.input_newIngre}
-                    placeholder="Đơn vị"
+                    placeholder='Đơn vị'
                     value={customIngredientUnit}
                     onChangeText={setCustomIngredientUnit}
                   />
                 </View>
               </View>
-              <View 
-                style={styles.back_button_new}
-              >  
-                <TouchableOpacity 
-                  style={styles.back_button}  
-                  onPress={() => setShowModal(false)}
-                >
+              <View style={styles.back_button_new}>
+                <TouchableOpacity style={styles.back_button} onPress={() => setShowModal(false)}>
                   <Text style={styles.text_button_new}>Hủy</Text>
                 </TouchableOpacity>
-                <TouchableOpacity  
+                <TouchableOpacity
                   style={{
-                    backgroundColor: "#FF9320", 
-                    marginHorizontal: 10, 
-                    paddingVertical: 5, 
-                    width: 80, 
+                    backgroundColor: '#FF9320',
+                    marginHorizontal: 10,
+                    paddingVertical: 5,
+                    width: 80,
                     borderRadius: 5,
-                  }}      
+                  }}
                   onPress={handleSaveCustomIngredient}
                 >
                   <Text style={styles.text_button_new}>Lưu</Text>
-                </TouchableOpacity>            
+                </TouchableOpacity>
               </View>
             </View>
           </View>
@@ -476,14 +581,14 @@ export default function NewRecipe() {
             <RNPickerSelect
               placeholder={{ label: 'Chọn nguyên liệu', value: null }}
               value={ingredient}
-              onValueChange={(value) => {if (value === 'custom') {
+              onValueChange={(value) => {
+                if (value === 'custom') {
                   setShowModal(true)
                 } else {
                   handleIngredientChange(value)
                 }
               }}
-              items={[...pickerItems,
-                { label: 'Khác', value: 'custom' },]}
+              items={[...pickerItems, { label: 'Khác', value: 'custom' }]}
             />
           </View>
           <TextInput
@@ -740,6 +845,9 @@ const styles = StyleSheet.create({
     width: '38%',
     textAlign: 'right',
   },
+  ingreList_box: {
+    height: 80,
+  },
   text_add: {
     width: '62%',
     fontSize: 15,
@@ -799,11 +907,11 @@ const styles = StyleSheet.create({
   },
   input_newIngre: {
     borderWidth: 1,
-    borderColor: "#CFCFCF",
+    borderColor: '#CFCFCF',
     marginHorizontal: 5,
     marginVertical: 2,
     borderRadius: 5,
-    width: "100%",
+    width: '100%',
     fontSize: 15,
   },
   up_new_ingre: {
@@ -818,44 +926,44 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
   back_modal: {
-    backgroundColor: "white", 
-    padding: 20, 
-    borderRadius: 10, 
-    alignItems: "center",
-    width: "90%", 
-    shadowColor: "#000", 
-    shadowOffset: { width: 0, height: 2 }, 
-    shadowOpacity: 0.25, 
-    shadowRadius: 4, 
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    width: '90%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
   },
   back_around_modal: {
-    flex: 1, 
-    justifyContent: "center", 
-    alignItems: "center", 
-    backgroundColor: "rgba(0, 0, 0, 0.5)"
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   back_input: {
-    flexDirection: "row", 
-    justifyContent: "center", 
-    alignItems: "center"
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   back_button_new: {
-    flexDirection: "row", 
-    alignItems: "center", 
-    justifyContent: "center",
-    marginTop: 10
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 10,
   },
   back_button: {
-      backgroundColor: "#FF9320", 
-      marginHorizontal: 10, 
-      paddingVertical: 5, 
-      width: 80, 
-      borderRadius: 5
+    backgroundColor: '#FF9320',
+    marginHorizontal: 10,
+    paddingVertical: 5,
+    width: 80,
+    borderRadius: 5,
   },
-  text_button_new:{
-    textAlign: "center", 
-    fontSize: 18, 
-    color: "white", 
-    fontWeight: "600"
-  }
+  text_button_new: {
+    textAlign: 'center',
+    fontSize: 18,
+    color: 'white',
+    fontWeight: '600',
+  },
 })
