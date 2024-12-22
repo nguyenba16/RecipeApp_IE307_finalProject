@@ -58,6 +58,7 @@ export default function DishDetail({ route }) {
   const [likeNumber, setLikeNumber] = useState(0)
   const [saveNumber, setSaveNumber] = useState(0)
 
+  console.log(detailDish)
   const fetchingReactNumber = async () => {
     try {
       const response = await api.get(`/get-like/${dishID}`)
